@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+        <services>
+            <defaults public="false" />
+            <service id="df.maker.make_scrud" class="DF\MakerBundle\Maker\MakeScrud">
+                <argument type="service" id="service_container" />
+                <argument type="service" id="maker.file_manager" />
+                <argument type="service" id="maker.doctrine_helper" />
+                <argument type="service" id="Symfony\Component\Templating\EngineInterface" />
+                <tag name="maker.command" />
+            </service>
+            <service id="df.maker.make_config" class="DF\MakerBundle\Maker\MakeConfig">
+                <argument type="service" id="service_container" />
+                <argument type="service" id="maker.doctrine_helper" />
+                <tag name="maker.command" />
+            </service>
+        </services>
+</container>

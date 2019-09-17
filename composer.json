@@ -1,0 +1,29 @@
+{
+    "name": "devfusion/maker-bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony Maker helps you create powerful crud.",
+    "homepage": "",
+    "license": "MIT",
+    "keywords": ["generator", "code generator", "scaffolding", "scaffold"],
+    "authors": [
+        {
+            "name": "Martin GILBERT",
+            "homepage": ""
+        }
+    ],
+    "require": {
+        "php": ">=7.1.25"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": { "DF\\MakerBundle\\": "" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

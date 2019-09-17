@@ -1,0 +1,34 @@
+<?php
+{% if config.search.pagination %}
+    if ((int) $page < 1) {
+        throw new \InvalidArgumentException(sprintf("The page argument can not be less than 1 (value : %s)",$page));
+    }
+{% if config.search.filter %}
+    $firstResult = ($page - 1) * $data['number_by_page'];
+{% else %}
+    $firstResult = ($page - 1) * $numberByPage;
+{% endif %}
+{% endif %}
+$query = $this->getSearchQuery({% if config.search.filter %}$data{% endif %});
+
+$query
+{% if config.search.pagination %}
+    ->setFirstResult($firstResult)
+    ->setMaxResults({% if config.search.filter %}$data['number_by_page']{% else %}$numberByPage{% endif %})
+{% endif %}
+    ->orderBy('{{ entity_first_letter ~ '.' ~ entity_identifier_lower_camel_case }}', 'ASC');
+
+{% if config.search.pagination %}
+    $paginator = new Paginator($query);
+    if ($paginator->count() <= $firstResult && $page != 1) {
+        if (!$request->get('page')) {
+            $session->set('{{ route_name }}_page', --$page);
+            return $this->search($request, $session, {% if config.search.filter %}$data, {% endif %}$page);
+        } else {
+            throw new NotFoundHttpException();
+        }
+    }
+    return $paginator;
+{% else %}
+    return $query->getQuery()->getResult();
+{% endif %}

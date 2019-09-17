@@ -1,0 +1,19 @@
+<?php
+$query = $this->createQueryBuilder('{{ entity_first_letter }}');
+{% if config.search.filter %}
+{% if entity_search_fields|length %}
+if(null !== $data['search']) {
+    $exprOrX = $query->expr()->orX();
+    $exprOrX
+        {% for field in entity_search_fields %}
+            ->add($query->expr()->like('{{ entity_first_letter ~ '.' ~ field }}', ':search')){{ loop.last ? ';' : '' }}
+        {% endfor %}
+    
+    $query
+        ->where($exprOrX)
+        ->setParameter('search', '%'.$data['search'].'%');
+}
+
+{% endif %}
+{% endif %}
+return $query;
