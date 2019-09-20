@@ -29,3 +29,18 @@ The df:make:scrud command generates an advanced controller from a configuration 
 * Possibility to generate a form allowing to select several elements at the same time in order to launch multiple actions (Example: Deletion of several elements at once).
 * Generation of an entity manager to better structure the generated code.
 * Modification of the repository linked to the entity to create search methods for the filter.
+
+## Installation
+
+Add templating engine in framework.yaml
+
+    framework:
+        ...
+        templating: { engines: ['twig'] }
+        
+Add twig namespace in twig.yaml
+
+    twig:
+        ...
+        paths:
+            '%kernel.project_dir%/vendor/devfusion/maker-bundle/Resources/skeleton': DFMaker

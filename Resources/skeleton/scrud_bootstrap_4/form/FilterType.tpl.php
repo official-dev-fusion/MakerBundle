@@ -16,13 +16,17 @@ class <?= $class_name ?> extends AbstractType
         $builder
             ->add('search', TextType::class, [
                 'label' => false,
-                'placeholder' => 'form_labels.search',
+                'attr' => [
+                    'placeholder' => 'form_labels.search',
+                ],
                 'required' => false,
             ])<?php if (!$config['search']['pagination']): ?>;<?php endif ?>
 <?php if ($config['search']['pagination']): ?>
             ->add('number_by_page', IntegerType::class, [
                 'label' => false,
-                'placeholder' => 'form_labels.number_by_page',
+                'attr' => [
+                    'placeholder' => 'form_labels.number_by_page',
+                ],
                 'empty_data' => <?= $manager_upper_camel_case ?>::NUMBER_BY_PAGE,
             ]);
 <?php endif ?>

@@ -13,7 +13,8 @@
     ],
     "require": {
         "php": "^7.0.8",
-        "symfony/maker-bundle": "^1.0"
+        "symfony/maker-bundle": "^1.0",
+        "symfony/templating": "^4.0"
     },
     "config": {
         "preferred-install": "dist",
