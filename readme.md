@@ -1,35 +1,31 @@
-#Introduction :
+# Introduction:
 
-Ce bundle est un outil de génération de code. Il s'inspire fortement du symfony/maker-bundle en ajoutant plusieurs fonctionnalités et plus de flexibilité au niveau de la configuration.
+This bundle is a code generation tool. It draws heavily on the symfony/maker-bundle by adding several features and more flexibility.
 
-Il a été conçu pour générer du code facilement adaptable respectant une philosofie SCRUD (search, create, read, update et delete) à partir d'un entité Doctrine.
+It was designed to generate easily adaptable code respecting a SCRUD philosophy (search, create, read, update and delete) from a Doctrine entity.
 
-La commande df:make:config génère un fichier de configuration.yaml basé sur une entité donnée située dans App\Entity. Ce fichier servira par la suite à générer le code. Le fichier doit être personnalisé afin de généerer le code attendu. Il se retrouve dans le dossier config/scrud.
+The df:make:config command generates a configuration.yaml file based on a given entity located in App\Entity. This file will be used later to generate the code. The file must be customized to generate the expected code. It ends up in the config/scrud folder.
 
-La commande df:make:scrud génère un contrôleur avancé à partir d'un fichier de configuration situé dans config/scrud. Ce contrôleur permet d'effectuer les cinq opérations de base sur un modèle.
+The df:make:scrud command generates an advanced controller from a configuration file located in config/scrud. This controller allows you to perform the five basic operations on a model.
 
-* Search : Liste de tous les enregistrements, filtre, pagination et multi-sélection;
-* Read : Affichage d'un enregistrement donné identifié par sa clé primaire;
-* Create : Créer un nouvel enregistrement;
-* Update : Édition d'un ou plusieurs enregistrement(s) existant(s);
-* Delete : Supprimer un ou plusieurs enregistrement(s) existant(s);
+* Search: List of all records, filter, pagination and multi-selection;
+* Read: Display of a given record identified by its primary key;
+* Create: Create a new record;
+* Update: Edit one or more existing record(s);
+* Delete: Delete one or more existing record(s);
 
-## Fonctionnalités :
-* Extraction des chaines de caractère à partir des vues et Génération de fichiers de traductions.
-* Possibilité de personalisé le fichier de traductions généré dan la langue locale.
-* Possibilité de remplacer les squelettes de templates afin de générer du code personalisé.
-* Possibilité de créer plusieurs squelettes et de choisir dans le fichier de configuration lequel sera utilisé pour générer le code.
-* Le squelettes par défaut utilise Bootstrap4 et JQuery dans les vues générées afin d'améliorer l'expérience visuelle.
-* Configuration d'un sous-dossier afin de séparer correctement le code généré (Exemple : Controller/Back or Controller/Front).
-* Configuration d'une sous route pour séparer les différentes parties de l'application (Exemple : admin/user/read).
-* Possibilité de générer un Voter afin de gérer l'accès de chacune des actions SCRUD selon le rôle de l'utilisateur.
-* Possibilité de choisir les actions SCRUD qui seront générés. Seulement l'action search est obligatoire.
-* Possibilité de générer un filtre afin de rechercher dans chacun des attributs de type strin ou text de l'entité.
-* Possibilité de générer une pagination dans laquelle l'utilisateur peut modifier le nombre d'élément par page directement dans le filtre de recherche.
-* Possibilité de générer un formulaire permettant de sélectionner plusieurs éléments en même temps afin de lancer des actions multiple (Exemple : Suppression de plusieurs éléments d'un seule coup).
-* Génération d'un gestionnaire d'entité afin de mieux structurer le code généré.
-* Modification du repository lié à l'entité afin de créer des méthodes de recherche pour le filtre.
-
-## Requirements
-* Symfony flex with Symfony => 4.0.
-* symfony/maker-bundle
+## Features:
+* Extraction of strings from views and generation of translation files.
+* Ability to customize the translation file generated in the local language.
+* Ability to replace skeletons templates to generate custom code.
+* Ability to create multiple skeletons and choose from the configuration file that will be used to generate the code.
+* Default skeletons use Bootstrap4 and JQuery in generated views to enhance the visual experience.
+* Configuration of a subfolder to correctly separate the generated code (Example: Controller / Back or Controller / Front).
+* Configuration of a sub-road to separate the different parts of the application (Example: admin / user / read).
+* Possibility to generate a Vote to manage the access of each of the actions SCRUD according to the role of the user.
+* Ability to choose the SCRUD actions that will be generated. Only the search action is required.
+* Ability to generate a filter to search in each of the entity's strings or text attributes.
+* Ability to generate a pagination in which the user can change the number of items per page directly in the search filter.
+* Possibility to generate a form allowing to select several elements at the same time in order to launch multiple actions (Example: Deletion of several elements at once).
+* Generation of an entity manager to better structure the generated code.
+* Modification of the repository linked to the entity to create search methods for the filter.
