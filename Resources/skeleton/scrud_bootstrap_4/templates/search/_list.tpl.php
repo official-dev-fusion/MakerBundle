@@ -4,19 +4,17 @@
 {{ form_errors(form_update_search) }}
 <?php endif ?>
 <div class="card mt-4 mb-4">
-    <div class="card-header text-center">
-        <h2>{{ 'search.h2'|trans() }}</h2>
-    </div>
-    <div class="card-content">
+    <div class="card-body">
+        <h2 class="card-title">{{ 'search.h2'|trans() }}</h2>
         <div class="table-responsive">
             <table class="table table-striped table-bordered">
                 <thead>
                     <tr>
 <?php if ($config['search']['multi_select']): ?>
 <?php if ($config['read']['activate'] or $config['update']['activate'] or $config['delete']['activate']): ?>
-                        <td colspan="2"><label><input type="checkbox" id="select_all" /> {{ 'fields.select_all'|trans() }}</label></td>
+                        <td colspan="2"><div class="form-check"><input type="checkbox" id="select_all" /></div></td>
 <?php else: ?>
-                        <td><label><input type="checkbox" id="select_all" /> {{ 'fields.select_all'|trans() }}</label></td>
+                        <td><div class="form-check"><input type="checkbox" id="select_all" />}</div></td>
 <?php endif ?>
 <?php else: ?>
 <?php if ($config['read']['activate'] or $config['update']['activate'] or $config['delete']['activate']): ?>
@@ -47,7 +45,7 @@
                         <td>
 <?php if ($config['read']['activate']): ?>
                             <a href="{{ path('<?= $route_name ?>_read', {'<?= $entity_identifier_snake_case ?>': <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}) }}" title="{{ 'button.read_title'|trans() }}"
-                                class="btn btn-primary btn-lg" aria-label="{{ 'button.read_title'|trans() }}">
+                                class="btn btn-primary" aria-label="{{ 'button.read_title'|trans() }}">
                                 <i class="fas fa-file-alt"></i>
                             </a>
 <?php endif ?>
@@ -57,7 +55,7 @@
 <?php else: ?>
                             <a href="{{ path('<?= $route_name ?>_update', {'<?= $entity_identifier_snake_case ?>': <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}) }}" title="{{ 'button.update_title'|trans() }}"
 <?php endif ?>
-                                class="btn btn-warning btn-lg" aria-label="{{ 'button.update_title'|trans() }}">
+                                class="btn btn-warning" aria-label="{{ 'button.update_title'|trans() }}">
                                 <i class="fas fa-edit"></i>
                             </a>
 <?php endif ?>
@@ -103,9 +101,19 @@ if ($config['read']['activate'] or $config['update']['activate'] or $config['del
     </div>
 </div>
 <?php if ($config['search']['multi_select']): ?>
-{{ form_row(form_update_search.action) }}
-<div class="text-center">
-    <button id="submit" class="btn btn-primary">{{ 'button.update_title'|trans() }}</button>
+<div class="card p-2 mt-2">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-9 col-lg-9">
+                {{ form_row(form_update_search.action) }}
+            </div>
+            <div class="col-md-3 col-lg-3">
+                <div class="text-center">
+                    <button id="submit" class="btn btn-primary btn-block">{{ 'button.update_title'|trans() }}</button>
+                </div>
+            </div>
+        </div>
+        {{ form_end(form_update_search) }}
+    </div>
 </div>
-{{ form_end(form_update_search) }}
 <?php endif ?>

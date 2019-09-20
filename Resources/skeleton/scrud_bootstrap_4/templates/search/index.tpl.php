@@ -38,7 +38,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-6">
-                <h1>{{ 'search.h1'|trans() }}</h1>
+                <h1 class="h3">{{ 'search.h1'|trans() }}</h1>
             </div>
             <div class="col-sm-6 text-right">
                 <p>

@@ -322,11 +322,16 @@ final class MakeScrud extends AbstractMaker
     
     private function getOverheadPath(string $relativePath)
     {
-        $path = $this->getAppRootDir().'/templates/bundles/DFMakerBundle/'.$relativePath;
+        $skeleton = $this->bag->get('config')['skeleton'];
+        $path = $this->getAppRootDir().'/templates/bundles/DFMakerBundle/'.$skeleton.'/'.$relativePath;
         if (file_exists($path)) {
             return $path;
         }
-        return __DIR__.'/../Resources/skeleton/scrud/'.$relativePath;
+        $path = __DIR__.'/../Resources/skeleton/'.$skeleton.'/'.$relativePath;
+        if (!file_exists($path)) {
+            throw new \Exception(sprintf("The file %s was not found. Are you sure the skeleton is correctly configured ?", $path));
+        }
+        return $path;
     }
 
     private function generateRepositoryMethods(ConsoleStyle $io)
@@ -375,7 +380,7 @@ final class MakeScrud extends AbstractMaker
             }
         } 
         $methodBody = $this->templating->render(
-            '@DFMaker/scrud/repository/_search_method_body.php.twig', 
+            '@DFMaker/'.$config['skeleton'].'/repository/_search_method_body.php.twig', 
             $this->bag->all()
         );
         
@@ -392,7 +397,7 @@ final class MakeScrud extends AbstractMaker
                 );
         }
         $methodBody = $this->templating->render(
-            '@DFMaker/scrud/repository/_get_search_query_method_body.php.twig',
+            '@DFMaker/'.$config['skeleton'].'/repository/_get_search_query_method_body.php.twig',
             $this->bag->all()
         );
         
@@ -405,95 +410,8 @@ final class MakeScrud extends AbstractMaker
     private function generateTranslationFiles(ConsoleStyle $io)
     {
         $config = $this->bag->get('config');
-        $translation = [];
-        $translation['entity_singular'] = $this->bag->get('entity_human_words_ucfirst');
-        $translation['entity_plural'] = $this->bag->get('entity_human_words_ucfirst_plural');
-        $translation['action']['delete'] = 'Delete';
-        $translation['action']['update'] = 'Update';
-        $translation['message']['no_data_found'] = 'No data found';
-        if ($config['search']['multi_select']) {
-            $translation['message']['no_element_selected'] = 'No element selected';
-        }
-        if ($config['create']['activate']) {
-            $translation['message']['create'] = $this->bag->get('entity_human_words_ucfirst').' created (%identifier%).';
-        }
-        if ($config['update']['activate']) {
-            $translation['message']['update'] = $this->bag->get('entity_human_words_ucfirst').' updated.';
-        }
-        if ($config['delete']['activate']) {
-            $translation['message']['delete_confirm'] = 'Confirmation of deletion';
-            if ($config['delete']['multi_select']) {
-                $translation['message']['delete_list'] = $this->bag->get('entity_human_words_ucfirst').'(s) deleted.';
-            } elseif ($config['delete']['multi_select']) {
-                $translation['message']['delete'] = $this->bag->get('entity_human_words_ucfirst').' deleted.';
-            }
-        }
-        if ($config['create']['activate'] || $config['read']['activate'] || $config['update']['activate'] || $config['delete']['multi_select']) {
-            $translation['button']['back'] = 'Back';
-        }
-        if ($config['create']['activate'] || $config['update']['activate']) {
-            $translation['button']['submit'] = 'Submit';
-        }
-        if ($config['create']['activate']) {
-            $translation['button']['create_title'] = 'Add';
-        }
-        if ($config['read']['activate']) {
-            $translation['button']['read_title'] = 'Read';
-        }
-        if ($config['update']['activate'] || $config['search']['multi_select']) {
-            $translation['button']['update_title'] = 'Update';
-        }
-        if ($config['delete']['activate']) {
-            $translation['button']['delete_title'] = 'Delete';
-        }
-        if ($config['search']['filter']) {
-            $translation['button']['filter'] = 'Filter';
-            $translation['form_labels']['search'] = 'Search';
-            if ($config['search']['pagination']) {
-                $translation['form_labels']['number_by_page'] = 'Number by page';
-            }
-        }
-        if ($config['search']['multi_select']) {
-            $translation['fields']['select_all'] = 'Select all';
-        } elseif ($config['read']['activate'] || $config['update']['activate'] || $config['delete']['activate']) {
-            $translation['fields']['action'] = 'Action(s)';
-        }
-        foreach ($this->bag->get('entity_form_fields') as $field) {
-            $translation['form_labels'][$field['field_snake_case']] = ucfirst(str_replace('_', ' ', $field['field_snake_case']));
-        }
-        foreach ($this->bag->get('entity_fields') as $field) {
-            $translation['fields'][$field['field_snake_case']] = ucfirst(str_replace('_', ' ', $field['field_snake_case']));
-        }
-        $translation['search']['title'] = 'Search - '.$this->bag->get('entity_human_words_ucfirst');
-        $translation['search']['h1'] = 'Search - '.$this->bag->get('entity_human_words_ucfirst');
-        $translation['search']['h2'] = 'Search';
-        if ($config['create']['activate']) {
-            $translation['create']['title'] = 'Create - '.$this->bag->get('entity_human_words_ucfirst');
-            $translation['create']['h1'] = 'Create - '.$this->bag->get('entity_human_words_ucfirst');
-            $translation['create']['h2'] = 'Create form';
-        }
-        if ($config['read']['activate']) {
-            $translation['read']['title'] = 'Read - '.$this->bag->get('entity_human_words_ucfirst');
-            $translation['read']['h1'] = '%identifier%';
-            $translation['read']['h2'] = 'Details';
-        }
-        if ($config['update']['activate']) {
-            $translation['update'] = [];
-            $translation['update']['title'] = 'Update - '.$this->bag->get('entity_human_words_ucfirst');
-            $translation['update']['h1'] = 'Update - '.$this->bag->get('entity_human_words_ucfirst');
-            $translation['update']['h2'] = 'Update form';
-        }
-        if ($config['delete']['activate']) {
-            $translation['delete']['modal_title'] = 'Delete - '.$this->bag->get('entity_human_words_ucfirst');
-            $translation['delete']['modal_button'] = 'Delete';
-            $translation['delete']['modal_button_cancel'] = 'Cancel';
-            $translation['delete']['warning'] = 'The deletion will be final.';
-        }
-        if ($config['delete']['multi_select']) {
-            $translation['delete']['h1'] = 'Delete - '.$this->bag->get('entity_human_words_ucfirst');
-            $translation['delete']['h2'] = 'The following list will be deleted';
-        }
-        
+        $bag = $this->bag;
+        include($this->getOverheadPath('translation/translate.php'));
         $yamlEnglish = Yaml::dump($translation);
         $directoryName = $this->getAppRootDir().'/translations/';
         if (!is_dir($directoryName)) {
@@ -527,7 +445,7 @@ final class MakeScrud extends AbstractMaker
     private function transElement($element, $local)
     {
         $translator = $this->container->get('translator');
-        $transcript = $translator->trans($element, [], 'crud', $local);
+        $transcript = $translator->trans($element, [], 'scrud', $local);
         if ($transcript !== $element) {
             return $transcript;
         }

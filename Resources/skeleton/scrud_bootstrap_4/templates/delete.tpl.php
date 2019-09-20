@@ -12,7 +12,7 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-6">
-                <h1>{{ 'delete.h1'|trans() }}</h1>
+                <h1 class="h3">{{ 'delete.h1'|trans() }}</h1>
             </div>
             <div class="col-sm-6 text-right">
                 <p>
@@ -23,12 +23,10 @@
             </div>
         </div>
         <hr>
-        <div class="col-sm-8 mx-auto">
-            <div class="card mt-4 mb-4">
-                <div class="card-header text-center">
-                    <h2>{{ 'delete.h2'|trans() }}</h2>
-                </div>
-                <div class="card-content m-2">
+        <div class="card mt-4 mb-4">
+            <div class="card-body">
+                <h2 class="card-title">{{ 'delete.h2'|trans() }}</h2>
+                <div class="card-content">
                     {{ form_start(form) }}
                         {{ form_errors(form) }}
                         <p class="text-danger">{{ 'delete.warning'|trans() }}</p>

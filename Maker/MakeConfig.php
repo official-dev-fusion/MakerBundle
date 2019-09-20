@@ -93,9 +93,10 @@ class MakeConfig extends AbstractMaker
         }
         $config = [];
         $config['entity'] = $entityClassDetails->getShortName();
-        $config['prefix_directory'] = 'back';
-        $config['prefix_route'] = 'back';
-        $config['voter'] = true;
+        $config['skeleton'] = 'scrud_bootstrap_4';
+        $config['prefix_directory'] = null;
+        $config['prefix_route'] = null;
+        $config['voter'] = false;
         $config['search'] = [];
         $config['search']['filter'] = true; 
         $config['search']['pagination'] = true;

@@ -1,18 +1,19 @@
 {
     "name": "devfusion/maker-bundle",
     "type": "symfony-bundle",
-    "description": "Symfony Maker helps you create powerful crud.",
-    "homepage": "",
+    "description": "This bundle is a code generation tool. It draws heavily on the symfony/maker-bundle by adding several features and more flexibility.",
+    "homepage": "https://github.com/official-dev-fusion/MakerBundle",
     "license": "MIT",
-    "keywords": ["generator", "code generator", "scaffolding", "scaffold"],
+    "keywords": ["generator", "code generator", "maker", "crud", "scrud", "skeleton", "symfony", "template", "override", "search", "create", "read", "update", "delete", "filter", "pagination", "multi-select"],
     "authors": [
         {
             "name": "Martin GILBERT",
-            "homepage": ""
+            "e-mail": "martin.gilbert@dev-fusion.com"
         }
     ],
     "require": {
-        "php": ">=7.1.25"
+        "php": "^7.0.8",
+        "symfony/maker-bundle": "^1.0"
     },
     "config": {
         "preferred-install": "dist",
