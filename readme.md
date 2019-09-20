@@ -44,3 +44,6 @@ Add twig namespace in twig.yaml
         ...
         paths:
             '%kernel.project_dir%/vendor/devfusion/maker-bundle/Resources/skeleton': DFMaker
+            
+## Notes :
+You must add block content in base.html.twig
