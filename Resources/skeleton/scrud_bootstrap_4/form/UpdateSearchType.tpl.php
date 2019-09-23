@@ -36,13 +36,15 @@ class <?= $class_name ?> extends AbstractType
         $builder
             ->add('<?= $entity_snake_case_plural ?>', EntityType::class, [
                 'label' => false,
+                'choice_label' => false,
                 'class' => <?= $entity_upper_camel_case ?>::class,
                 'choices' => $options['<?= $entity_snake_case_plural ?>'],
                 'expanded' => true,
                 'multiple' => true,
             ])
             ->add('action', ChoiceType::class, [
-                'label' => 'Action',
+                'label' => false,
+                'placeholder' => 'Action',
                 'choices' => [
 <?php if ($config['update']['multi_select']): ?>
                     'action.update' => 'update',

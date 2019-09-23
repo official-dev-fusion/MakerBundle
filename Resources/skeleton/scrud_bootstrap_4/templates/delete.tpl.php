@@ -35,7 +35,7 @@
                                 <li>{{ <?= $entity_snake_case ?> }}</li>
                             {% endfor %}
                         </ul>
-                        <button class="btn btn-warning btn-block">
+                        <button class="btn btn-danger btn-block">
                             <i class="far fa-paper-plane"></i> {{ 'button.delete_title'|trans() }}
                         </button>
                     {{ form_end(form) }}

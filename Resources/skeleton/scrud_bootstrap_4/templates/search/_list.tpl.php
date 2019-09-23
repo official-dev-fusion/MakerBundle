@@ -12,7 +12,8 @@
                     <tr>
 <?php if ($config['search']['multi_select']): ?>
 <?php if ($config['read']['activate'] or $config['update']['activate'] or $config['delete']['activate']): ?>
-                        <td colspan="2"><div class="form-check"><input type="checkbox" id="select_all" /></div></td>
+                        <td><div class="form-check pl-0"><input type="checkbox" id="select_all" /></div></td>
+                        <td>{{ 'fields.action'|trans() }}</td>
 <?php else: ?>
                         <td><div class="form-check"><input type="checkbox" id="select_all" />}</div></td>
 <?php endif ?>
@@ -68,7 +69,7 @@
                                 data-path="{{ path('<?= $route_name ?>_delete', { '<?= $entity_identifier_snake_case ?>': <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}) }}"
 <?php endif ?>
                                 title="{{ 'button.delete_title'|trans() }}" aria-label="{{ 'button.delete_title'|trans() }}">
-                                <i class="fas fa-times fa-2x"></i>
+                                <i class="fas fa-times"></i>
                             </a>
 <?php endif ?>
                         </td>

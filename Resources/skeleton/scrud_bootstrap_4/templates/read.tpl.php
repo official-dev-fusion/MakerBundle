@@ -27,7 +27,7 @@
             <div class="card-body">
                 <h2 class="card-title">{{ 'read.h2'|trans() }}</h2>
                 <div class="card-content">
-                    <ul class="liste-unstyled">
+                    <ul class="list-unstyled">
 <?php foreach ($entity_fields as $field): ?>
 <?php if ($field['field_lower_camel_case'] != $entity_identifier_lower_camel_case): ?>
 <?php 
