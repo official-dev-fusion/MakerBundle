@@ -30,9 +30,9 @@
                     {{ form_start(form) }}
                         {{ form_errors(form) }}
                         <p class="text-danger">{{ 'delete.warning'|trans() }}</p>
-                        <ul class="list-unstyled">
+                        <ul class="list-unstyled mb-4">
                             {% for <?= $entity_snake_case ?> in <?= $entity_snake_case_plural ?> %}
-                                <li>{{ <?= $entity_snake_case ?> }}</li>
+                                <li class="p-2">{{ <?= $entity_snake_case ?> }}</li>
                             {% endfor %}
                         </ul>
                         <button class="btn btn-danger btn-block">

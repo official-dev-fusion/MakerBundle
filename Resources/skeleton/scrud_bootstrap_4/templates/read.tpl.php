@@ -40,7 +40,7 @@ if ($field['field_type'] == 'date') {
         .$entity_snake_case.".".$field['field_lower_camel_case']."|localizeddate('medium', 'short') : ''";
 }
 ?>
-                        <li class="bg-secondary text-light p-2 mb-2 ">
+                        <li class="p-2 mb-2">
                             <strong>{{ '<?= 'fields.'.$field['field_snake_case'] ?>'|trans() }} : </strong>{{ <?= $value ?> }}
                         </li>
 <?php endif; ?>

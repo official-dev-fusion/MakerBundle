@@ -35,12 +35,12 @@
 <?php else: ?>
                         {{ form_errors(form.<?= $entity_snake_case_plural ?>) }}
                         {% for <?= $entity_snake_case ?>_field in form.<?= $entity_snake_case_plural ?> %}
-                            <div class="card p-3 mb-4 bg-light">
+                            <div class="p-4 mb-4 border border-light">
                                 <span class="font-weight-bold">{{ form_label(<?= $entity_snake_case ?>_field) }}</span>
 <?php foreach ($entity_form_fields as $field): ?>
                                 {{ form_row(<?= $entity_snake_case ?>_field.<?= $field['field_lower_camel_case'] ?>) }}
 <?php endforeach; ?>
-                        </div>
+                            </div>
                         {% endfor %}
 <?php endif ?>
                         <button class="btn btn-primary btn-block">

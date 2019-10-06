@@ -26,7 +26,7 @@
         <div class="card mt-4 mb-4">
             <div class="card-body">
                 <h2 class="card-title">{{ 'create.h2'|trans() }}</h2>
-                <div class="card-content p-2">
+                <div class="p-4 border border-light">
                     {{ form_start(form) }}
 <?php foreach ($entity_form_fields as $field): ?>
                         {{ form_row(form.<?= $field['field_lower_camel_case'] ?>) }}

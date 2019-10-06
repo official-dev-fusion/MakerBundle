@@ -123,7 +123,7 @@ final class MakeScrud extends AbstractMaker
                 'Repository\\',
                 'Repository'
             );
-        }
+        } else { throw new LogicException(sprintf("The %s entity class is not linked with a repository class.", $entityClassDetails->getFullName())); }
         
         $this->bag = new ScrudBag($entityClassDetails, $this->doctrineHelper, $repositoryClassDetails, $config);
         $prefix = $config['prefix_directory'];

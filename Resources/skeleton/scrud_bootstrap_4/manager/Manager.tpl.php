@@ -134,7 +134,7 @@ class <?= $class_name ?><?= "\n" ?>
                 $value = '';
             }
         }
-        return [ '<?= $route_name ?>_search' => $data ];
+        return [ '<?= $entity_snake_case ?>_filter' => $data ];
     }
 <?php endif ?>
     

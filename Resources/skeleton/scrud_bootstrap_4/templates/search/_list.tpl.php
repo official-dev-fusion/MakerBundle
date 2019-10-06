@@ -12,14 +12,14 @@
                     <tr>
 <?php if ($config['search']['multi_select']): ?>
 <?php if ($config['read']['activate'] or $config['update']['activate'] or $config['delete']['activate']): ?>
-                        <td><div class="form-check pl-0"><input type="checkbox" id="select_all" /></div></td>
-                        <td>{{ 'fields.action'|trans() }}</td>
+                        <th><div class="form-check pl-0"><input type="checkbox" id="select_all" /></div></th>
+                        <th>{{ 'fields.action'|trans() }}</th>
 <?php else: ?>
-                        <td><div class="form-check"><input type="checkbox" id="select_all" />}</div></td>
+                        <th><div class="form-check"><input type="checkbox" id="select_all" />}</div></th>
 <?php endif ?>
 <?php else: ?>
 <?php if ($config['read']['activate'] or $config['update']['activate'] or $config['delete']['activate']): ?>
-                        <td>{{ 'fields.action'|trans() }}</td>
+                        <th>{{ 'fields.action'|trans() }}</th>
 <?php endif ?>
 <?php endif ?>
 <?php foreach ($entity_fields as $field): ?>
@@ -110,7 +110,7 @@ if ($config['read']['activate'] or $config['update']['activate'] or $config['del
             </div>
             <div class="col-md-3 col-lg-3">
                 <div class="text-center">
-                    <button id="submit" class="btn btn-primary btn-block">{{ 'button.update_title'|trans() }}</button>
+                    <button id="submit" class="btn btn-primary btn-block">{{ 'button.validate_title'|trans() }}</button>
                 </div>
             </div>
         </div>

@@ -34,6 +34,9 @@ if ($config['read']['activate']) {
 if ($config['update']['activate'] || $config['search']['multi_select']) {
     $translation['button']['update_title'] = 'Update';
 }
+if ($config['search']['multi_select']) {
+    $translation['button']['validate_title'] = 'Validate';
+}
 if ($config['delete']['activate']) {
     $translation['button']['delete_title'] = 'Delete';
 }
