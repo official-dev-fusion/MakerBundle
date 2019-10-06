@@ -10,7 +10,7 @@
         return $href;
     }
 ?>
-{% trans_default_domain 'back_gentle_puppy' %}
+{% trans_default_domain '<?= $entity_translation_name ?>' %}
 {% if number_page > 1 %}
 {% if page > 1 %}
     {% set previous = page - 1 %}
