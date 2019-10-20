@@ -16,7 +16,7 @@ $query
     ->setFirstResult($firstResult)
     ->setMaxResults({% if config.search.filter %}$data['number_by_page']{% else %}$numberByPage{% endif %})
 {% endif %}
-    ->orderBy('{{ entity_first_letter ~ '.' ~ entity_identifier_lower_camel_case }}', 'ASC');
+    ->orderBy('{{ entity_first_letter ~ '.' ~ entity_identifier_lower_camel_case }}', 'DESC');
 
 {% if config.search.pagination %}
     $paginator = new Paginator($query);

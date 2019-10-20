@@ -22,6 +22,7 @@ class <?= $class_name ?> extends AbstractType
                 'required' => false,
             ])<?php if (!$config['search']['pagination']): ?>;<?php endif ?>
 <?php if ($config['search']['pagination']): ?>
+
             ->add('number_by_page', IntegerType::class, [
                 'label' => false,
                 'attr' => [
