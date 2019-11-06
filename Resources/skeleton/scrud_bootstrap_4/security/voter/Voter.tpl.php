@@ -2,7 +2,7 @@
 
 namespace <?= $namespace; ?>;
 
-use <?= $entity_full_class_name ?>;
+use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;

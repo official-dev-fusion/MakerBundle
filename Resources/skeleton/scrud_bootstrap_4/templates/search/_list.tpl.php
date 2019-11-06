@@ -114,7 +114,7 @@ if ($config['read']['activate'] or $config['update']['activate'] or $config['del
                 </div>
             </div>
         </div>
-        {{ form_end(form_update_search) }}
     </div>
 </div>
+{{ form_end(form_update_search) }}
 <?php endif ?>
