@@ -1,16 +1,5 @@
-<?php
-    function get_href(string $route_name, array $config, string $page) {
-        $href = "{{ path('";
-        $href .= $route_name;
-        $href .= "_search', { 'page' : $page }";
-        if ($config['search']['filter']) {
-            $href .= "|merge(query_data)";
-        }
-        $href .= ") }}";
-        return $href;
-    }
-?>
-{% trans_default_domain '<?= $entity_translation_name ?>' %}
+<?php include_once(__DIR__.'/../functions.php'); ?>
+{% trans_default_domain '<?= $file_translation_name ?>' %}
 {% if number_page > 1 %}
 {% if page > 1 %}
     {% set previous = page - 1 %}
@@ -31,11 +20,11 @@
         <ul class="pagination justify-content-center pagination-sm">
             {% if previous is defined %}
                 <li class="page-item">
-                    <a class="page-link" rel="prev" href="<?= get_href($route_name, $config, 'previous') ?>">&laquo;&nbsp;{{ 'pagination.previous'|trans() }}</a>
+                    <a class="page-link" rel="prev" href="<?= get_href($route_name, $config, 'previous') ?>">&laquo;&nbsp;{{ 'button.previous'|trans() }}</a>
                 </li>
             {% else %}
                 <li class="page-item disabled">
-                    <span class="page-link">&laquo;&nbsp;{{ 'pagination.previous'|trans() }}</span>
+                    <span class="page-link">&laquo;&nbsp;{{ 'button.previous'|trans() }}</span>
                 </li>
             {% endif %}
             {% if range_start > 1 %}
@@ -55,18 +44,22 @@
             {% set pages = [] %}
             {% if (range_start -1) > 10 %}
                 {% set ten = range_start - range_start % 10 %}
-                {% for i in 1..3 if ten > 1 %}
-                    {% if ten != range_start %}
-                        {% set pages = ([ten]|merge(pages)) %}
-                    {% endif %}
-                    {% set ten = (range_start - i * 10) - (range_start - i * 10) % 10 %}
-                {% endfor %}
+                {% if ten > 1 %}
+                    {% for i in 1..3 %}
+                        {% if ten != range_start %}
+                            {% set pages = ([ten]|merge(pages)) %}
+                        {% endif %}
+                        {% set ten = (range_start - i * 10) - (range_start - i * 10) % 10 %}
+                    {% endfor %}
+                {% endif %}
                 {% if ten > 100 %}
                     {% set hundred = (ten) - (ten) % 100 %}
-                    {% for i in 1..3 if hundred > 1 %}
-                        {% set pages = [hundred]|merge(pages) %}
-                        {% set hundred = (ten - i * 100) - (ten - i * 100) % 100 %}
-                    {% endfor %}
+                    {% if hundred > 1 %}
+                        {% for i in 1..3 %}
+                            {% set pages = [hundred]|merge(pages) %}
+                            {% set hundred = (ten - i * 100) - (ten - i * 100) % 100 %}
+                        {% endfor %}
+                    {% endif %}
                 {% endif %}
             {% endif %}
             {% for p in pages %}
@@ -87,20 +80,24 @@
             {% endfor %}
             {% if (number_page - range_end) > 10 %}
                 {% set ten = (range_end + 10) - (range_end + 10) % 10 %}
-                {% for i in 2..4 if ten < number_page %}
-                    <li class="page-item">
-                        <a class="page-link" href="<?= get_href($route_name, $config, 'ten') ?>">{{ ten }}</a>
-                    </li>
-                    {% set ten = (range_end + i * 10) - (range_end + i * 10) % 10 %}
-                {% endfor %}
+                {% if ten < number_page %}
+                    {% for i in 2..4 %}
+                        <li class="page-item">
+                            <a class="page-link" href="<?= get_href($route_name, $config, 'ten') ?>">{{ ten }}</a>
+                        </li>
+                        {% set ten = (range_end + i * 10) - (range_end + i * 10) % 10 %}
+                    {% endfor %}
+                {% endif %}
                 {% if (number_page - ten) > 100 %}
                     {% set hundred = (ten + 100) - (ten + 100) % 100 %}
-                    {% for i in 2..4 if hundred < number_page %}
-                        <li class="page-item">
-                            <a class="page-link" href="<?= get_href($route_name, $config, 'hundred') ?>">{{ hundred }}</a>
-                        </li>
-                        {% set hundred = (ten + i * 100) - (ten + i * 100) % 100 %}
-                    {% endfor %}
+                    {%  if hundred < number_page %}
+                        {% for i in 2..4 %}
+                            <li class="page-item">
+                                <a class="page-link" href="<?= get_href($route_name, $config, 'hundred') ?>">{{ hundred }}</a>
+                            </li>
+                            {% set hundred = (ten + i * 100) - (ten + i * 100) % 100 %}
+                        {% endfor %}
+                    {% endif %}
                 {% endif %}
             {% endif %}
             {% if number_page > range_end %}
@@ -121,11 +118,11 @@
             {% endif %}
             {% if next is defined %}
                 <li class="page-item">
-                    <a class="page-link" rel="next" href="<?= get_href($route_name, $config, 'next') ?>">{{ 'pagination.next'|trans() }}&nbsp;&raquo;</a>
+                    <a class="page-link" rel="next" href="<?= get_href($route_name, $config, 'next') ?>">{{ 'button.next'|trans() }}&nbsp;&raquo;</a>
                 </li>
             {% else %}
                 <li  class="page-item disabled">
-                    <span class="page-link">{{ 'pagination.next'|trans() }}&nbsp;&raquo;</span>
+                    <span class="page-link">{{ 'button.next'|trans() }}&nbsp;&raquo;</span>
                 </li>
             {% endif %}
         </ul>

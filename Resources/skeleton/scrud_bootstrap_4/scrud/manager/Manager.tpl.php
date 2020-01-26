@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class <?= $class_name ?><?= "\n" ?>
 {
-<?php if ($config['search']['filter']): ?>
+<?php if ($config['search']['filter_view']['activate']): ?>
     const NUMBER_BY_PAGE = 15;
 <?php endif ?>    
     /**
@@ -72,7 +72,7 @@ class <?= $class_name ?><?= "\n" ?>
         $this->translator = $translator;
     }
     
-<?php if ($config['search']['filter']): ?>
+<?php if ($config['search']['filter_view']['activate']): ?>
     /**
      * Configure the filter form
      * 
@@ -129,12 +129,15 @@ class <?= $class_name ?><?= "\n" ?>
      */
     public function getQueryData(array $data)
     {
-        foreach ($data as &$value) {
+        $queryData['filter'] = [];
+        foreach ($data as $key => $value) {
             if (null === $value) {
-                $value = '';
+                $queryData['filter'][$key] = '';
+            } else {
+                $queryData['filter'][$key] = $value;
             }
         }
-        return [ '<?= $entity_snake_case ?>_filter' => $data ];
+        return $queryData;
     }
 <?php endif ?>
     
@@ -149,10 +152,10 @@ class <?= $class_name ?><?= "\n" ?>
      * @throws LogicException
      * @return boolean|string
      */
-    public function validationUpdateSearchForm(FormInterface $form)
+    public function validationBatchForm(FormInterface $form)
     {
         $<?= $entity_lower_camel_case_plural ?> = $form->get('<?= $entity_snake_case_plural ?>')->getData();
-        if (0 === count($<?= $entity_lower_camel_case_plural ?>)) { return $this->translator->trans("message.no_element_selected", [], 'back_user'); }
+        if (0 === count($<?= $entity_lower_camel_case_plural ?>)) { return $this->translator->trans("error.no_element_selected", [], '<?= $file_translation_name ?>'); }
         $action = $form->get('action')->getData();
         
         switch ($action) {
@@ -215,7 +218,7 @@ class <?= $class_name ?><?= "\n" ?>
      * @param FormInterface $form
      * @return boolean|string
      */
-    public function dispatchUpdateSearchForm(FormInterface $form)
+    public function dispatchBatchForm(FormInterface $form)
     {
         $<?= $entity_lower_camel_case_plural ?> = $form->get('<?= $entity_snake_case_plural ?>')->getData();
         $action = $form->get('action')->getData();

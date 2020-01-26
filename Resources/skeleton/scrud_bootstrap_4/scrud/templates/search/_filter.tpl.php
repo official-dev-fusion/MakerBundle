@@ -1,4 +1,4 @@
-{% trans_default_domain '<?= $entity_translation_name ?>' %}
+{% trans_default_domain '<?= $file_translation_name ?>' %}
 <div class="card p-2 mb-2">
     <div class="card-body">
         {{ form_start(form_filter) }}

@@ -24,7 +24,6 @@ use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\Validator\Validation;
 use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Console\Exception\LogicException;
@@ -37,13 +36,20 @@ use PhpParser\Node\Expr\Variable;
 use PhpParser\BuilderFactory;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use DF\MakerBundle\ScrudBag;
 use DF\MakerBundle\ScrudConfiguration;
+use DF\MakerBundle\TranslationTree;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Yaml\Exception\ParseException;
 
 /**
- * @author Martin GILBERT <martin3129@gmail.com>
+ * @author Martin GILBERT <martin.gilbert@dev-fusion.com>
  */
-final class MakeScrud extends AbstractMaker
+final class ScrudExec extends AbstractMaker
 {
     
     /**
@@ -59,19 +65,19 @@ final class MakeScrud extends AbstractMaker
     private $fileManager;
     
     /**
-     * 
-     * @var DoctrineHelper 
+     *
+     * @var DoctrineHelper
      */
     private $doctrineHelper;
 
     /**
-     * 
+     *
      * @var EngineInterface
      */
     private $templating;
     
     /**
-     * 
+     *
      * @var ScrudBag
      */
     private $bag;
@@ -86,7 +92,7 @@ final class MakeScrud extends AbstractMaker
     
     public static function getCommandName(): string
     {
-        return 'df:make:scrud';
+        return 'df:scrud:exec';
     }
     
     public function configureCommand(Command $command, InputConfiguration $inputConfig)
@@ -104,13 +110,28 @@ final class MakeScrud extends AbstractMaker
     
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator)
     {
-        $configFilePath = $this->getAppRootDir().'\\config\\scrud\\'.$input->getArgument('config-file');
+        $configFilePath = $this->getAppRootDir().'\\config\\dev_fusion\\scrud\\'.$input->getArgument('config-file');
         $processor = new Processor();
         $config = Yaml::parseFile($configFilePath);
-        $processor->processConfiguration(new ScrudConfiguration(), [ 'scrud_config' => $config ]);
+        $config = $processor->processConfiguration(new ScrudConfiguration($this->doctrineHelper, $generator), [ 'scrud_config' => $config ]);
+        /*$configFilePath = $this->getAppRootDir().'\\config\\scrud\\test.yaml';
+        $str = Yaml::dump($config, 5);
+        file_put_contents($configFilePath, $str);
+        die();
+        */
+        foreach ($config['entities'] as $key => $values) {
+            $this->generateElement($key, $values, $input, $io, $generator);
+        }
+        $io->text(exec(sprintf("php %s/bin/console cache:clear", $this->getAppRootDir())));
+    }
+
+    private function generateElement(string $name, array $config, InputInterface $input, ConsoleStyle $io, Generator $generator)
+    {
+        $entityClassExplode = explode('\\', $config['class']);
+        $entityClassName = array_pop($entityClassExplode);
         
         $entityClassDetails = $generator->createClassNameDetails(
-            Validator::entityExists($config['entity'], $this->doctrineHelper->getEntitiesForAutocomplete()),
+            $entityClassName,
             'Entity\\'
         );
         
@@ -123,21 +144,16 @@ final class MakeScrud extends AbstractMaker
                 'Repository\\',
                 'Repository'
             );
-        } else { throw new LogicException(sprintf("The %s entity class is not linked with a repository class.", $entityClassDetails->getFullName())); }
-        
+        } else {
+            throw new LogicException(sprintf("The %s entity class is not linked with a repository class.", $entityClassDetails->getFullName()));
+        }
+        $config['name'] = $name;
         $this->bag = new ScrudBag($entityClassDetails, $this->doctrineHelper, $repositoryClassDetails, $config);
         $prefix = $config['prefix_directory'];
-        
-        /*echo ('<pre>');
-        //var_dump($this->bag);
-        echo ('</pre>');
-        var_dump($config);
-        die();
-        */
         if (null !== $entityDoctrineDetails->getRepositoryClass()) {
             $reflectionClass = new \ReflectionClass($entityDoctrineDetails->getRepositoryClass());
             $this->bag->set('repository_path', $reflectionClass->getFileName());
-        }             
+        }
 
         $directoryName = '\\';
         if ($prefix) {
@@ -145,7 +161,7 @@ final class MakeScrud extends AbstractMaker
         }
         
         $controllerClassDetails = $generator->createClassNameDetails(
-            $entityClassDetails->getRelativeNameWithoutSuffix(),
+            $this->bag->get('name_upper_camel_case'),
             'Controller'.$directoryName,
             'Controller'
         );
@@ -153,12 +169,12 @@ final class MakeScrud extends AbstractMaker
             throw new LogicException(sprintf("The %s class already exists.", $controllerClassDetails->getFullName()));
         }
         
-        if ($config['search']['filter'] 
+        if ($config['search']['filter_view']['activate']
             || $config['search']['multi_select']
             || $config['search']['pagination']
         ) {
             $managerClassDetails = $generator->createClassNameDetails(
-                $entityClassDetails->getShortName().'Manager',
+                $this->bag->get('name_upper_camel_case').'Manager',
                 'Manager'
             );
             if (class_exists($managerClassDetails->getFullName())) {
@@ -169,25 +185,48 @@ final class MakeScrud extends AbstractMaker
         
         if ($config['create']['activate'] || $config['update']['activate']) {
             $formClassDetails = $generator->createClassNameDetails(
-                $entityClassDetails->getRelativeNameWithoutSuffix(),
+                $this->bag->get('name_upper_camel_case'),
                 'Form'.$directoryName,
                 'Type'
             );
             if (class_exists($formClassDetails->getFullName())) {
                 throw new LogicException(sprintf("The %s class already exists.", $formClassDetails->getFullName()));
             }
+            
             $this->bag->setElement('form', $formClassDetails);
             $generator->generateClass(
                 $formClassDetails->getFullName(),
                 $this->getOverheadPath('form/Type.tpl.php'),
                 $this->bag->all()
             );
+            if ($config['update']['activate']) {
+                if ('UpdateType' === $this->bag->get('config')['update']['form_type']) {
+                    $formUpdateClassDetails = $generator->createClassNameDetails(
+                        $this->bag->get('name_upper_camel_case'),
+                        'Form'.$directoryName,
+                        'UpdateType'
+                    );
+                    if (class_exists($formUpdateClassDetails->getFullName())) {
+                        throw new LogicException(sprintf("The %s class already exists.", $formUpdateClassDetails->getFullName()));
+                    }
+                    
+                    $this->bag->setElement('form_update', $formUpdateClassDetails);
+                    $generator->generateClass(
+                        $formUpdateClassDetails->getFullName(),
+                        $this->getOverheadPath('form/UpdateType.tpl.php'),
+                        $this->bag->all()
+                    );
+                } else {
+                    $this->bag->setElement('form_update', $formClassDetails);
+                }
+            }
         }
         
         if ($config['voter']) {
             $voterClassDetails = $generator->createClassNameDetails(
-                $entityClassDetails->getRelativeNameWithoutSuffix().'Voter',
-                'Security\\Voter'
+                $this->bag->get('name_upper_camel_case'),
+                'Security\\Voter'.$directoryName,
+                'Voter'
             );
             if (class_exists($voterClassDetails->getFullName())) {
                 throw new LogicException(sprintf("The %s class already exists.", $voterClassDetails->getFullName()));
@@ -195,9 +234,9 @@ final class MakeScrud extends AbstractMaker
         }
         
         $templates = [];
-        if ($config['search']['filter']) {
+        if ($config['search']['filter_view']['activate']) {
             $formFilterClassDetails = $generator->createClassNameDetails(
-                $entityClassDetails->getRelativeNameWithoutSuffix(),
+                $this->bag->get('name_upper_camel_case'),
                 'Form'.$directoryName,
                 'FilterType'
             );
@@ -215,30 +254,30 @@ final class MakeScrud extends AbstractMaker
         }
         
         if ($config['update']['multi_select']) {
-            $formUpdateClassDetails = $generator->createClassNameDetails(
-                $entityClassDetails->getRelativeNameWithoutSuffix(),
+            $formCollectionUpdateClassDetails = $generator->createClassNameDetails(
+                $this->bag->get('name_upper_camel_case'),
                 'Form'.$directoryName,
-                'UpdateType'
+                'CollectionUpdateType'
             );
-            if (class_exists($formUpdateClassDetails->getFullName())) {
-                throw new LogicException(sprintf("The %s class already exists.", $formUpdateClassDetails->getFullName()));
+            if (class_exists($formCollectionUpdateClassDetails->getFullName())) {
+                throw new LogicException(sprintf("The %s class already exists.", $formCollectionUpdateClassDetails->getFullName()));
             }
-            $this->bag->setElement('form_update', $formUpdateClassDetails);
+            $this->bag->setElement('form_collection_update', $formCollectionUpdateClassDetails);
         }
         
         if ($config['search']['multi_select']) {
-            $formUpdateSearchClassDetails = $generator->createClassNameDetails(
-                $entityClassDetails->getRelativeNameWithoutSuffix(),
+            $formBatchClassDetails = $generator->createClassNameDetails(
+                $this->bag->get('name_upper_camel_case'),
                 'Form'.$directoryName,
-                'UpdateSearchType'
+                'BatchType'
             );
-            if (class_exists($formUpdateSearchClassDetails->getFullName())) {
-                throw new LogicException(sprintf("The %s class already exists.", $formUpdateSearchClassDetails->getFullName()));
-            }    
-            $this->bag->setElement('form_update_search', $formUpdateSearchClassDetails);
+            if (class_exists($formBatchClassDetails->getFullName())) {
+                throw new LogicException(sprintf("The %s class already exists.", $formBatchClassDetails->getFullName()));
+            }
+            $this->bag->setElement('form_batch', $formBatchClassDetails);
         }
         
-        if ($config['search']['filter'] 
+        if ($config['search']['filter_view']['activate']
             || $config['search']['multi_select']
             || $config['search']['pagination']
         ) {
@@ -249,23 +288,23 @@ final class MakeScrud extends AbstractMaker
             );
         }
         
-        if ($config['update']['multi_select']) {        
+        if ($config['update']['multi_select']) {
             $generator->generateClass(
-                $formUpdateClassDetails->getFullName(),
-                $this->getOverheadPath('form/UpdateType.tpl.php'),
+                $formCollectionUpdateClassDetails->getFullName(),
+                $this->getOverheadPath('form/CollectionUpdateType.tpl.php'),
                 $this->bag->all()
             );
         }
         
         if ($config['search']['multi_select']) {
             $generator->generateClass(
-                $formUpdateSearchClassDetails->getFullName(),
-                $this->getOverheadPath('form/UpdateSearchType.tpl.php'),
+                $formBatchClassDetails->getFullName(),
+                $this->getOverheadPath('form/BatchType.tpl.php'),
                 $this->bag->all()
             );
         }
         
-        $templates['search/index'] = $this->bag->all();    
+        $templates['search/index'] = $this->bag->all();
         $templates['search/_list'] = $this->bag->all();
         
         if ($config['search']['pagination']) {
@@ -307,27 +346,30 @@ final class MakeScrud extends AbstractMaker
             );
         }
         
-        if ($config['search']['filter'] || $config['search']['pagination']) {
-            $this->generateRepositoryMethods($io);
-        }
+        
+        $this->generateRepositoryMethods($io);
+        
         $this->generateTranslationFiles($io);
         $generator->writeChanges();
 
         $this->writeSuccessMessage($io);
 
-        $io->text(sprintf('Next: Check your new CRUD by going to <fg=yellow>%s/</>', 
-            Str::asRoutePath($controllerClassDetails->getRelativeNameWithoutSuffix()))
+        $io->text(
+            sprintf(
+                'Next: Check your new SCRUD by going to <fg=yellow>%s/</>',
+                $this->bag->get('route_path')."/search"
+            )
         );
     }
     
     private function getOverheadPath(string $relativePath)
     {
         $skeleton = $this->bag->get('config')['skeleton'];
-        $path = $this->getAppRootDir().'/templates/bundles/DFMakerBundle/'.$skeleton.'/'.$relativePath;
+        $path = $this->getAppRootDir().'/templates/bundles/DFMakerBundle/'.$skeleton.'/scrud/'.$relativePath;
         if (file_exists($path)) {
             return $path;
         }
-        $path = __DIR__.'/../Resources/skeleton/'.$skeleton.'/'.$relativePath;
+        $path = __DIR__.'/../Resources/skeleton/'.$skeleton.'/scrud/'.$relativePath;
         if (!file_exists($path)) {
             throw new \Exception(sprintf("The file %s was not found. Are you sure the skeleton is correctly configured ?", $path));
         }
@@ -341,7 +383,7 @@ final class MakeScrud extends AbstractMaker
         }
         $config = $this->bag->get('config');
         $manipulator = new ClassSourceManipulator($this->fileManager->getFileContents($this->bag->get('repository_path')));
-        $manipulator->setIo($io);        
+        $manipulator->setIo($io);
         
         if ($config['search']['pagination']) {
             $manipulator->addUseStatementIfNecessary('\Doctrine\ORM\Tools\Pagination\Paginator');
@@ -349,55 +391,56 @@ final class MakeScrud extends AbstractMaker
             $manipulator->addUseStatementIfNecessary('\Symfony\Component\HttpFoundation\Session\Session');
             $manipulator->addUseStatementIfNecessary('\Symfony\Component\HttpKernel\Exception\NotFoundHttpException');
         }
-        $method = $manipulator->createMethodBuilder('search', null, false, [
-                sprintf('@return %S[] Returns an array of %s objects', 
-                    $this->bag->get('entity_upper_camel_case'), 
+        $method = $manipulator->createMethodBuilder($this->bag->get('search_method'), null, false, [
+                sprintf(
+                    '@return %S[] Returns an array of %s objects',
+                    $this->bag->get('entity_upper_camel_case'),
                     $this->bag->get('entity_upper_camel_case')
                 )
             ]);
         if ($config['search']['pagination']) {
             $method->addParam(
-                    (new \PhpParser\Builder\Param('request'))->setTypeHint('Request')
-                );
+                (new \PhpParser\Builder\Param('request'))->setTypeHint('Request')
+            );
             $method->addParam(
-                    (new \PhpParser\Builder\Param('session'))->setTypeHint('Session')
-                );
+                (new \PhpParser\Builder\Param('session'))->setTypeHint('Session')
+            );
         }
-        if ($config['search']['filter']) {
+        if ($config['search']['filter_view']['activate']) {
             $method->addParam(
                 (new \PhpParser\Builder\Param('data'))->setTypeHint('array')
-                );
+            );
         }
         
         if ($config['search']['pagination']) {
             $method->addParam(
                 (new \PhpParser\Builder\Param('page'))->setTypeHint('string')->makeByRef()
-                );
-            if (!$config['search']['filter']) {
+            );
+            if (!$config['search']['filter_view']['activate']) {
                 $method->addParam(
                     (new \PhpParser\Builder\Param('numberByPage'))->setTypeHint('int')
-                    );
+                );
             }
-        } 
+        }
         $methodBody = $this->templating->render(
-            '@DFMaker/'.$config['skeleton'].'/repository/_search_method_body.php.twig', 
+            '@DFMaker/'.$config['skeleton'].'/scrud/repository/_search_method_body.php.twig',
             $this->bag->all()
         );
         
         $manipulator->addMethodBody($method, $methodBody);
         $manipulator->addMethodBuilder($method);
         
-        $method = $manipulator->createMethodBuilder('getSearchQuery', null, false, [
+        $method = $manipulator->createMethodBuilder($this->bag->get('search_query_method'), null, false, [
                 '@return \\Doctrine\\DBAL\\Query\\QueryBuilder',
             ]);
         
-        if ($config['search']['filter']) {
+        if ($config['search']['filter_view']['activate']) {
             $method->addParam(
-                    (new \PhpParser\Builder\Param('data'))->setTypeHint('array')
-                );
+                (new \PhpParser\Builder\Param('data'))->setTypeHint('array')
+            );
         }
         $methodBody = $this->templating->render(
-            '@DFMaker/'.$config['skeleton'].'/repository/_get_search_query_method_body.php.twig',
+            '@DFMaker/'.$config['skeleton'].'/scrud/repository/_get_search_query_method_body.php.twig',
             $this->bag->all()
         );
         
@@ -411,33 +454,56 @@ final class MakeScrud extends AbstractMaker
     {
         $config = $this->bag->get('config');
         $bag = $this->bag;
-        include($this->getOverheadPath('translation/translate.php'));
-        $yamlEnglish = Yaml::dump($translation);
+        
         $directoryName = $this->getAppRootDir().'/translations/';
-        if (!is_dir($directoryName)) {
-            mkdir($directoryName, 0755);
+        $filesystem = new Filesystem();
+        if (!$filesystem->exists($directoryName)) {
+            $filesystem->mkdir($directoryName);
         }
-        $pathFileTranslation = $directoryName.$this->bag->get('entity_translation_name').'.en.yaml';
-        touch($pathFileTranslation);
+        
+        $pathFileTranslation = $directoryName.$this->bag->get('file_translation_name').'.en.yaml';
+        if (!$filesystem->exists($pathFileTranslation)) {
+            $filesystem->touch($pathFileTranslation);
+        }
+        try {
+            $fileTranslation = Yaml::parseFile($pathFileTranslation);
+        } catch (ParseException $exception) {
+            printf('Unable to parse the YAML string: %s', $exception->getMessage());
+        }
+        if (!$fileTranslation) {
+            $fileTranslation=[];
+        }
+        $tree = new TranslationTree($fileTranslation);
+        include($this->getOverheadPath('translation/translate.php'));
+        $yamlEnglish = Yaml::dump($tree->ksort()->all(), 4);
+        
         file_put_contents($pathFileTranslation, $yamlEnglish);
-        $local = $this->container->getParameter("kernel.default_locale");
-        foreach ($translation as &$elements) {
-            if (is_array($elements)) {
-                foreach ($elements as &$element) {
-                    $element = $this->transElement($element, $local);
-                }
-            } else {
-                $elements = $this->transElement($elements, $local);
-            }
+        
+        $locale = $this->container->getParameter("kernel.default_locale");
+        $pathFileTranslation = $directoryName.$this->bag->get('file_translation_name').'.'.$locale.'.yaml';
+        if (!$filesystem->exists($pathFileTranslation)) {
+            $filesystem->touch($pathFileTranslation);
         }
-        $yamlLocal = Yaml::dump($translation);
-        $pathFileTranslation = $directoryName.$this->bag->get('entity_translation_name').'.'.$local.'.yaml';
-        touch($pathFileTranslation);
-        file_put_contents($pathFileTranslation, $yamlLocal);
+        try {
+            $fileTranslation = Yaml::parseFile($pathFileTranslation);
+        } catch (ParseException $exception) {
+            printf('Unable to parse the YAML string: %s', $exception->getMessage());
+        }
+        if (!$fileTranslation) {
+            $fileTranslation=[];
+        }
+        $translationThreeLocale = new TranslationTree($fileTranslation);
+        foreach ($tree->keys() as $key) {
+            $value = $this->transElement($tree->get($key), $locale);
+            $translationThreeLocale->set($key, $value);
+        }
+        
+        $yamlLocale = Yaml::dump($translationThreeLocale->ksort()->all(), 4);
+        file_put_contents($pathFileTranslation, $yamlLocale);
     }
     
     /**
-     * 
+     *
      * @param string $element
      * @param fr $local
      * @return string
@@ -455,8 +521,10 @@ final class MakeScrud extends AbstractMaker
         }
         $transcript = '';
         foreach ($words as $word) {
-            $transcript .= $translator->trans($word, [], 'crud', $local);
-            if (next($words)) { $transcript .= ' '; }
+            $transcript .= $translator->trans($word, [], 'scrud', $local);
+            if (next($words)) {
+                $transcript .= ' ';
+            }
         }
         return $transcript;
     }

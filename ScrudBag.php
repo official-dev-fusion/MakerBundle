@@ -10,10 +10,6 @@ use Symfony\Bundle\MakerBundle\Str;
  */
 class ScrudBag implements \IteratorAggregate, \Countable
 {
-    const IGNORE_FORM_FIELDS = [
-        'createdAt',
-        'updatedAt',
-    ];
     
     /**
      * Parameter storage.
@@ -28,6 +24,17 @@ class ScrudBag implements \IteratorAggregate, \Countable
         $entityDoctrineDetails = $doctrineHelper->createDoctrineDetails($entityClassDetails->getFullName());
         $this->parameters = [];
         $this->set('config', $config);
+        $name = Str::asCamelCase($config['name']);
+        $this->set('name_upper_camel_case', $name);
+        $this->set('name_upper_camel_case_plural', Inflector::pluralize($this->get('name_upper_camel_case')));
+        $this->set('name_lower_camel_case', Str::asLowerCamelCase($name));
+        $this->set('name_lower_camel_case_plural', Inflector::pluralize($this->get('name_lower_camel_case')));
+        $this->set('name_snake_case', Str::asSnakeCase($name));
+        $this->set('name_snake_case_plural', Inflector::pluralize($this->get('name_snake_case')));
+        $this->set('name_human_words', str_replace('_', ' ', $this->get('name_snake_case')));
+        $this->set('name_human_words_ucfirst', ucfirst($this->get('name_human_words')));
+        $this->set('name_human_words_plural', str_replace('_', ' ', $this->get('name_snake_case_plural')));
+        $this->set('name_human_words_plural_ucfirst', ucfirst($this->get('name_human_words_plural')));
         $this->setElement('entity', $entityClassDetails, true);
         $this->set('entity_first_letter', substr($this->get('entity_lower_camel_case'), 0, 1));
         $this->set('entity_identifier_snake_case', $entityDoctrineDetails->getIdentifier());
@@ -43,102 +50,37 @@ class ScrudBag implements \IteratorAggregate, \Countable
         if (null !== $repositoryClassDetails) {
             $this->set('repository_full_class_name', $repositoryClassDetails->getFullName());
             $this->set('repository_upper_camel_case', $repositoryClassDetails->getShortName());
-            $this->set('repository_lower_camel_case', lcfirst(Inflector::singularize($repositoryClassDetails->getShortName())));           
+            $this->set('repository_lower_camel_case', lcfirst(Inflector::singularize($repositoryClassDetails->getShortName())));
         }
-        $this->setFields($entityClassDetails, $entityDoctrineDetails, $doctrineHelper);
         $this->setConfig();
-    }
-    
-    private function setFields($entityClassDetails, $entityDoctrineDetails, $doctrineHelper)
-    {
-        $entityMetadata = $doctrineHelper->getMetadata($entityClassDetails->getFullName());
-        
-        $entityFields = [];
-        foreach ($entityDoctrineDetails->getDisplayFields() as $value) {
-            $entityFields[] = [
-                'field_lower_camel_case' => $value['fieldName'],
-                'field_snake_case' => $value['columnName'],
-                'field_type' => $value['type'],
-            ];
-        }
-        $this->set('entity_fields', $entityFields);
-        $entitySearchFields = [];
-        $entityFormFields = [];
-        $fieldTypeFullClassNames = [];
-        foreach($entityDoctrineDetails->getFormFields() as $key => $value) {
-            if (!in_array($key, self::IGNORE_FORM_FIELDS)) {
-                $typeField = $entityMetadata->getTypeOfField($key);
-                if ('string' == $typeField || 'text' == $typeField) {
-                    $entitySearchFields[] = Str::asLowerCamelCase($key);
-                }
-                $formType = $this->getFormType($key, $typeField);
-                if ($formType) {
-                    $fieldTypeClass = $formType.'::class';
-                    $fieldTypeFullClassName = 'Symfony\\Component\\Form\\Extension\\Core\\Type\\'.$formType;
-                    if (!in_array($fieldTypeFullClassName, $fieldTypeFullClassNames)) {
-                        $fieldTypeFullClassNames[] = $fieldTypeFullClassName;
-                    }
-                } else {
-                     $fieldTypeClass = 'null';
-                }
-                
-                $entityFormFields[] = [ 
-                    'field_snake_case' => Str::asTwigVariable($key),
-                    'field_lower_camel_case' => $key,
-                    'field_type_class' => $fieldTypeClass,
-                ];
-            }
-        }
-        $this->set('entity_search_fields', $entitySearchFields);
-        $this->set('field_type_full_class_names', $fieldTypeFullClassNames);
-        $this->set('entity_form_fields', $entityFormFields);
-    }
-    
-    private function getFormType($name, $type)
-    {
-        switch ($type) {
-            case 'integer': return 'IntegerType';
-            case 'string': 
-                if ('email' === $name) {
-                    return 'EmailType';
-                } elseif ('url' === $name) {
-                    return 'UrlType';
-                } elseif ('tel' === $name) {
-                    return 'TelType';
-                } elseif ('password' === $name) {
-                    return 'PasswordType';
-                } elseif ('color' === $name) {
-                    return 'ColorType';
-                } else {
-                    return 'TextType';
-                }
-            case 'text': return 'TextareaType';
-            case 'date': 
-                if ('birthday' === $name || 'birthdate' === $name) {
-                    return 'BirthdayType';
-                } else {
-                    return 'DateType';
-                }
-            case 'datetime': return 'DateTimeType';
-            default : return null;
-        }
     }
     
     private function setConfig()
     {
-        $this->set('entity_translation_name', $this->get('entity_snake_case'));
-        $this->set('route_name', $this->get('entity_snake_case'));
-        $this->set('route_path', Str::asRoutePath($this->get('entity_snake_case')));
-        $this->set('templates_path', $this->get('entity_snake_case'));
+        $this->set('file_translation_name', 'messages');
+        $this->set('entity_translation_name', $this->get('name_snake_case'));
+        $this->set('route_name', $this->get('name_snake_case'));
+        $this->set('route_path', Str::asRoutePath($this->get('name_snake_case')));
+        $this->set('templates_path', $this->get('name_snake_case'));
+        $this->set('search_method', 'search');
+        $this->set('search_query_method', 'getSearchQuery');
+        if ($this->get('name_upper_camel_case') !== $this->get('entity_upper_camel_case')) {
+            $this->set('search_method', 'search'.$this->get('name_upper_camel_case'));
+            $this->set('search_query_method', 'getSearch'.$this->get('name_upper_camel_case').'Query');
+        }
         if ($this->get('config')['prefix_directory']) {
             $prefix = $this->get('config')['prefix_directory'];
+            $this->set('file_translation_name', $prefix.'_'.$this->get('file_translation_name'));
             $this->set('entity_translation_name', $prefix.'_'.$this->get('entity_translation_name'));
             $this->set('templates_path', $prefix.'/'.$this->get('templates_path'));
             $this->set('route_name', $prefix.'_'.$this->get('route_name'));
         }
-        if ($this->get('config')['prefix_route']) {
+        if (isset($this->get('config')['prefix_route']) && $this->get('config')['prefix_route']) {
             $prefix = $this->get('config')['prefix_route'];
             $this->set('route_path', '/'.$prefix.$this->get('route_path'));
+        }
+        if (isset($this->get('config')['update'])) {
+            $this->set('update_form_type', $this->get('entity_upper_camel_case').$this->get('config')['update']['form_type']);
         }
     }
 

@@ -56,7 +56,7 @@ class <?= $class_name ?> extends AbstractType
                 'multiple' => false,
             ])
             ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {            
-                $result = $this-><?= $manager_lower_camel_case ?>->validationUpdateSearchForm($event->getForm());
+                $result = $this-><?= $manager_lower_camel_case ?>->validationBatchForm($event->getForm());
                 if (true !== $result) {
                     $event->getForm()->addError(new FormError($result));
                 }
@@ -67,7 +67,7 @@ class <?= $class_name ?> extends AbstractType
     {
         $resolver->setDefaults([
             '<?= $entity_snake_case_plural ?>' => null,
-            'translation_domain' => '<?= $entity_translation_name ?>',
+            'translation_domain' => '<?= $file_translation_name ?>',
         ]);
     }
 }

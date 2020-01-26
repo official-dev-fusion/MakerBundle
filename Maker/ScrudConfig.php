@@ -27,9 +27,9 @@ use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\Validator\Validation;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
-class MakeConfig extends AbstractMaker
+class ScrudConfig extends AbstractMaker
 {
-    protected static $defaultName = 'MakeConfig';
+    protected static $defaultName = 'ScrudConfig';
     
     /**
      *
@@ -38,8 +38,8 @@ class MakeConfig extends AbstractMaker
     private $container;
 
     /**
-     * 
-     * @var DoctrineHelper 
+     *
+     * @var DoctrineHelper
      */
     private $doctrineHelper;
     
@@ -51,7 +51,7 @@ class MakeConfig extends AbstractMaker
 
     public static function getCommandName(): string
     {
-        return 'df:make:config';
+        return 'df:scrud:config';
     }
     
     public function configureCommand(Command $command, InputConfiguration $inputConfig)
@@ -62,6 +62,12 @@ class MakeConfig extends AbstractMaker
                 'entity-class',
                 InputArgument::OPTIONAL,
                 sprintf('The class name of the entity to create SCRUD configuration (e.g. <fg=yellow>%s</>)', Str::asClassName(Str::getRandomTerm()))
+            )
+            ->addOption('level',
+                'l',
+                InputOption::VALUE_REQUIRED,
+                'Level to generate a scrud configuration file.',
+                1
             );
         $inputConfig->setArgumentAsNonInteractive('entity-class');
     }
@@ -83,36 +89,72 @@ class MakeConfig extends AbstractMaker
     
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator)
     {
+        $level = $input->getOption('level');
         $entityClassDetails = $generator->createClassNameDetails(
             Validator::entityExists($input->getArgument('entity-class'), $this->doctrineHelper->getEntitiesForAutocomplete()),
             'Entity\\'
         );
-        $directoryName = $this->getAppRootDir().'/config/scrud/';
+        
+        $directoryName = $this->getAppRootDir().'/config/dev_fusion/';
+        
         if (!is_dir($directoryName)) {
             mkdir($directoryName, 0755);
         }
-        $config = [];
-        $config['entity'] = $entityClassDetails->getShortName();
-        $config['skeleton'] = 'scrud_bootstrap_4';
-        $config['prefix_directory'] = null;
-        $config['prefix_route'] = null;
-        $config['voter'] = false;
-        $config['search'] = [];
-        $config['search']['filter'] = true; 
-        $config['search']['pagination'] = true;
-        $config['search']['multi_select'] = true;
-        $config['create'] = [];
-        $config['create']['activate'] = true;
-        $config['read'] = [];
-        $config['read']['activate'] = true;
-        $config['update'] = [];
-        $config['update']['activate'] = true;
-        $config['update']['multi_select'] = true;
-        $config['delete'] = [];
-        $config['delete']['activate'] = true;
-        $config['delete']['multi_select'] = true;
+
+        $directoryName .= 'scrud/';
+
+        if (!is_dir($directoryName)) {
+            mkdir($directoryName, 0755);
+        }
         
-        $yaml = Yaml::dump($config);
+        $entityDoctrineDetails = $this->doctrineHelper->createDoctrineDetails($entityClassDetails->getFullName());
+
+        $config = [];
+        $entity = &$config['entities'][$entityClassDetails->getShortName()];
+         
+        $entity['class'] = $entityClassDetails->getFullName();
+        if ($level > 0) {    
+            $fields = array_keys($entityDoctrineDetails->getDisplayFields());
+            if ($level > 1) {
+                $entity['skeleton'] = 'scrud_bootstrap_4';
+            }
+            $entity['prefix_directory'] = null;
+            $entity['prefix_route'] = null;
+            $entity['voter'] = false;
+            $entity['fields'] = $fields;
+            if ($level > 1) {
+                $forms = array_keys($entityDoctrineDetails->getFormFields());
+                $entity['forms'] = $forms;
+            }
+            $entity['search'] = [];
+            if ($level > 1) {
+                $entity['search']['dql_filter'] = '';
+                $entity['search']['order'] = [
+                    [
+                        'by' => 'entity.'.$entityDoctrineDetails->getIdentifier(),
+                        'direction' => 'DESC',
+                    ]
+                ];
+            }
+            $entity['search']['pagination'] = true;
+            $entity['search']['multi_select'] = true;
+            $entity['search']['filter_view']['activate'] = true;
+            $entity['create'] = [];
+            $entity['create']['activate'] = true;
+            $entity['read'] = [];
+            $entity['read']['activate'] = true;
+            if ($level > 1) {
+                $entity['read']['action_up'] = false;
+                $entity['read']['action_down'] = false;
+            }
+            $entity['update'] = [];
+            $entity['update']['activate'] = true;
+            $entity['update']['multi_select'] = true;
+            $entity['delete'] = [];
+            $entity['delete']['activate'] = true;
+            $entity['delete']['multi_select'] = true;
+        }
+        $yaml = Yaml::dump($config, 5);
         $pathFileConfig =  $directoryName . Str::asSnakeCase($entityClassDetails->getShortName()) . '.yaml';
         touch($pathFileConfig);
         file_put_contents($pathFileConfig, $yaml);

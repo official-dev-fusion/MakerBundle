@@ -17,7 +17,7 @@ class <?= $class_name ?> extends AbstractType
         $builder
             ->add('<?= $entity_snake_case_plural ?>', CollectionType::class, [
                 'label' => false,
-                'entry_type' => <?= $form_upper_camel_case ?>::class,
+                'entry_type' => <?= $form_update_upper_camel_case ?>::class,
                 'entry_options' => [
                     'label' => false,
                 ],
@@ -29,7 +29,7 @@ class <?= $class_name ?> extends AbstractType
     {
         $resolver->setDefaults([
             '<?= $entity_snake_case_plural ?>' => null,
-            'translation_domain' => '<?= $entity_translation_name ?>',
+            'translation_domain' => '<?= $file_translation_name ?>',
         ]);
     }
     

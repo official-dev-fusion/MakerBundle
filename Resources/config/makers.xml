@@ -6,14 +6,26 @@
 
         <services>
             <defaults public="false" />
-            <service id="df.maker.make_scrud" class="DF\MakerBundle\Maker\MakeScrud">
+            <service id="df.scrud.exec" class="DF\MakerBundle\Maker\ScrudExec">
                 <argument type="service" id="service_container" />
                 <argument type="service" id="maker.file_manager" />
                 <argument type="service" id="maker.doctrine_helper" />
                 <argument type="service" id="Symfony\Component\Templating\EngineInterface" />
                 <tag name="maker.command" />
             </service>
-            <service id="df.maker.make_config" class="DF\MakerBundle\Maker\MakeConfig">
+            <service id="df.scrud.config" class="DF\MakerBundle\Maker\ScrudConfig">
+                <argument type="service" id="service_container" />
+                <argument type="service" id="maker.doctrine_helper" />
+                <tag name="maker.command" />
+            </service>
+            <service id="df.form.exec" class="DF\MakerBundle\Maker\FormExec">
+                <argument type="service" id="service_container" />
+                <argument type="service" id="maker.file_manager" />
+                <argument type="service" id="maker.doctrine_helper" />
+                <argument type="service" id="Symfony\Component\Templating\EngineInterface" />
+                <tag name="maker.command" />
+            </service>
+            <service id="df.form.config" class="DF\MakerBundle\Maker\FormConfig">
                 <argument type="service" id="service_container" />
                 <argument type="service" id="maker.doctrine_helper" />
                 <tag name="maker.command" />

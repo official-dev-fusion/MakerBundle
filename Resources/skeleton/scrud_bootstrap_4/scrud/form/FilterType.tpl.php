@@ -17,7 +17,7 @@ class <?= $class_name ?> extends AbstractType
             ->add('search', TextType::class, [
                 'label' => false,
                 'attr' => [
-                    'placeholder' => 'form_labels.search',
+                    'placeholder' => 'label.filter_search',
                 ],
                 'required' => false,
             ])<?php if (!$config['search']['pagination']): ?>;<?php endif ?>
@@ -26,7 +26,7 @@ class <?= $class_name ?> extends AbstractType
             ->add('number_by_page', IntegerType::class, [
                 'label' => false,
                 'attr' => [
-                    'placeholder' => 'form_labels.number_by_page',
+                    'placeholder' => 'label.filter_number_by_page',
                 ],
                 'empty_data' => <?= $manager_upper_camel_case ?>::NUMBER_BY_PAGE,
             ]);
@@ -38,7 +38,12 @@ class <?= $class_name ?> extends AbstractType
         $resolver->setDefaults([
             'csrf_protection' => false,
             'method' => 'GET',
-            'translation_domain' => '<?= $entity_translation_name ?>',
+            'translation_domain' => '<?= $file_translation_name ?>',
         ]);
+    }
+    
+    public function getBlockPrefix()
+    {
+        return 'filter';
     }
 }
