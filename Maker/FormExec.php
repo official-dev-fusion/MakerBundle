@@ -34,7 +34,6 @@ use PhpParser\Builder\Method;
 use PhpParser\Node\Param;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\BuilderFactory;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -69,12 +68,6 @@ final class FormExec extends AbstractMaker
      * @var DoctrineHelper
      */
     private $doctrineHelper;
-
-    /**
-     *
-     * @var EngineInterface
-     */
-    private $templating;
     
     /**
      *
@@ -82,12 +75,11 @@ final class FormExec extends AbstractMaker
      */
     private $bag;
     
-    public function __construct(ContainerInterface $container, FileManager $fileManager, DoctrineHelper $doctrineHelper, EngineInterface $templating)
+    public function __construct(ContainerInterface $container, FileManager $fileManager, DoctrineHelper $doctrineHelper)
     {
         $this->container = $container;
         $this->fileManager = $fileManager;
         $this->doctrineHelper = $doctrineHelper;
-        $this->templating = $templating;
     }
     
     public static function getCommandName(): string
