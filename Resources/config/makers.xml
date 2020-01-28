@@ -10,7 +10,7 @@
                 <argument type="service" id="service_container" />
                 <argument type="service" id="maker.file_manager" />
                 <argument type="service" id="maker.doctrine_helper" />
-                <argument type="service" id="Symfony\Component\Templating\EngineInterface" />
+                <argument type="service" id="Twig\Environment" />
                 <tag name="maker.command" />
             </service>
             <service id="df.scrud.config" class="DF\MakerBundle\Maker\ScrudConfig">
