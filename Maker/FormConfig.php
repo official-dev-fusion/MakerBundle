@@ -121,6 +121,12 @@ class FormConfig extends AbstractMaker
         touch($pathFileConfig);
         file_put_contents($pathFileConfig, $yaml);
         $io->writeln('OK');
+        $io->text(
+            sprintf(
+                'Next: Check your new Form configuration file by going to <fg=yellow>%s/</>',
+                $pathFileConfig
+            )
+        );
     }
     
     /**
