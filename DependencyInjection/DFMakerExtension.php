@@ -24,12 +24,6 @@ class DFMakerExtension extends Extension implements PrependExtensionInterface
                 '%kernel.project_dir%/vendor/devfusion/maker-bundle/Resources/skeleton' => 'DFMaker',
             ],
         ]);
-        
-        $container->loadFromExtension('framework', [
-            'templating' => [
-                'engines' => [ 'twig', ],
-            ],
-        ]);
     }
     
     /**
