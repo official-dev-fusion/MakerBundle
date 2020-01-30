@@ -114,11 +114,7 @@ final class ScrudExec extends AbstractMaker
         $processor = new Processor();
         $config = Yaml::parseFile($configFilePath);
         $config = $processor->processConfiguration(new ScrudConfiguration($this->doctrineHelper, $generator), [ 'scrud_config' => $config ]);
-        /*$configFilePath = $this->getAppRootDir().'\\config\\scrud\\test.yaml';
-        $str = Yaml::dump($config, 5);
-        file_put_contents($configFilePath, $str);
-        die();
-        */
+        
         foreach ($config['entities'] as $key => $values) {
             $this->generateElement($key, $values, $input, $io, $generator);
         }
@@ -175,7 +171,7 @@ final class ScrudExec extends AbstractMaker
         ) {
             $managerClassDetails = $generator->createClassNameDetails(
                 $this->bag->get('name_upper_camel_case').'Manager',
-                'Manager'
+                'Manager'.$directoryName
             );
             if (class_exists($managerClassDetails->getFullName())) {
                 throw new LogicException(sprintf("The %s class already exists.", $managerClassDetails->getFullName()));
