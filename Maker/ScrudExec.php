@@ -460,7 +460,11 @@ final class ScrudExec extends AbstractMaker
         $pathFileTranslation = $directoryName.$this->bag->get('file_translation_name').'.en.yaml';
         if (!$filesystem->exists($pathFileTranslation)) {
             $filesystem->touch($pathFileTranslation);
+            $message = 'created: ' . 'translations/' . $this->bag->get('file_translation_name') . '.en.yaml';
+        } else {
+            $message = 'updated: ' . 'translations/' . $this->bag->get('file_translation_name') . '.en.yaml';
         }
+        
         try {
             $fileTranslation = Yaml::parseFile($pathFileTranslation);
         } catch (ParseException $exception) {
@@ -475,19 +479,33 @@ final class ScrudExec extends AbstractMaker
         
         file_put_contents($pathFileTranslation, $yamlEnglish);
         
+        $io->text($message);
+        
         $locale = $this->container->getParameter("kernel.default_locale");
+        
+        if ('en' === $locale) {
+            return;
+        }
+        
         $pathFileTranslation = $directoryName.$this->bag->get('file_translation_name').'.'.$locale.'.yaml';
+        
         if (!$filesystem->exists($pathFileTranslation)) {
             $filesystem->touch($pathFileTranslation);
+            $message = 'updated: ' . 'translations/' . $this->bag->get('file_translation_name') . '.' . $locale . '.yaml';
+        } else {
+            $message = 'updated: ' . 'translations/' . $this->bag->get('file_translation_name') . '.' . $locale . '.yaml';
         }
+        
         try {
             $fileTranslation = Yaml::parseFile($pathFileTranslation);
         } catch (ParseException $exception) {
             printf('Unable to parse the YAML string: %s', $exception->getMessage());
         }
+        
         if (!$fileTranslation) {
             $fileTranslation=[];
         }
+        
         $translationThreeLocale = new TranslationTree($fileTranslation);
         foreach ($tree->keys() as $key) {
             $value = $this->transElement($tree->get($key), $locale);
@@ -496,6 +514,7 @@ final class ScrudExec extends AbstractMaker
         
         $yamlLocale = Yaml::dump($translationThreeLocale->ksort()->all(), 4);
         file_put_contents($pathFileTranslation, $yamlLocale);
+        $io->text($message);
     }
     
     /**
