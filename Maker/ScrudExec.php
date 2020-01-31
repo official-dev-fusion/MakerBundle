@@ -167,7 +167,6 @@ final class ScrudExec extends AbstractMaker
         
         if ($config['search']['filter_view']['activate']
             || $config['search']['multi_select']
-            || $config['search']['pagination']
         ) {
             $managerClassDetails = $generator->createClassNameDetails(
                 $this->bag->get('name_upper_camel_case').'Manager',
@@ -275,7 +274,6 @@ final class ScrudExec extends AbstractMaker
         
         if ($config['search']['filter_view']['activate']
             || $config['search']['multi_select']
-            || $config['search']['pagination']
         ) {
             $generator->generateClass(
                 $managerClassDetails->getFullName(),
