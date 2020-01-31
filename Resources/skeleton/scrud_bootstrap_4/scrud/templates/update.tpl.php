@@ -32,7 +32,7 @@
                 <h2 class="card-title">{{ '<?= $name_snake_case ?>.update.h2'|trans() }}</h2>
                 <div class="card-content p-2 mb-4">
                     {{ form_start(form) }}
-<?php if (!$config['search']['multi_select']): ?>
+<?php if (!$config['update']['multi_select']): ?>
 <?php foreach ($forms as $form): ?>
                         {{ form_row(form.<?= $form['property'] ?>) }}
 <?php endforeach; ?>
