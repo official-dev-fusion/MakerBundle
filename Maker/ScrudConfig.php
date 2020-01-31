@@ -162,7 +162,7 @@ class ScrudConfig extends AbstractMaker
         $io->text(
             sprintf(
                 'Next: Check your new SCRUD configuration file by going to <fg=yellow>%s/</>',
-                $pathFileConfig
+                'config/dev_fusion/scrud/' . Str::asSnakeCase($entityClassDetails->getShortName()) . '.yaml'
             )
         );
     }

@@ -118,13 +118,14 @@ class FormConfig extends AbstractMaker
         
         $yaml = Yaml::dump($config, 5);
         $pathFileConfig =  $directoryName . Str::asSnakeCase($entityClassDetails->getShortName()) . '.yaml';
+        
         touch($pathFileConfig);
         file_put_contents($pathFileConfig, $yaml);
         $io->writeln('OK');
         $io->text(
             sprintf(
                 'Next: Check your new Form configuration file by going to <fg=yellow>%s/</>',
-                $pathFileConfig
+                'config/dev_fusion/form/' . Str::asSnakeCase($entityClassDetails->getShortName()) . '.yaml'
             )
         );
     }
