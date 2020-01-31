@@ -234,7 +234,7 @@ else: ?>$numberByPage<?php endif ?>) ?: 1,
 <?php else: ?>
 
     /**
-     * @Route("/{<?= $entity_identifier_snake_case ?>}/update", name="<?= $route_name ?>_update", methods="GET|POST")
+     * @Route("/update/{<?= $entity_identifier_snake_case ?>}", name="<?= $route_name ?>_update", methods="GET|POST")
      */
     public function update(Request $request, <?= $entity_upper_camel_case ?> $<?= $entity_lower_camel_case ?>): Response
     {
@@ -305,7 +305,7 @@ else: ?>$numberByPage<?php endif ?>) ?: 1,
 <?php else: ?>
 
     /**
-     * @Route("/{<?= $entity_identifier_snake_case ?>}/delete", name="<?= $route_name ?>_delete", methods="GET|POST")
+     * @Route("/delete/{<?= $entity_identifier_snake_case ?>}", name="<?= $route_name ?>_delete", methods="GET|POST")
      */
     public function delete(Request $request, <?= $entity_upper_camel_case ?> $<?= $entity_lower_camel_case ?>): Response
     {
