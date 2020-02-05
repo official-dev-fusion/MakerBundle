@@ -350,7 +350,7 @@ final class ScrudExec extends AbstractMaker
 
         $io->text(
             sprintf(
-                'Next: Check your new SCRUD by going to <fg=yellow>%s/</>',
+                'Next: Check your new SCRUD by going to <fg=yellow>%s</>',
                 $this->bag->get('route_path')."/search"
             )
         );

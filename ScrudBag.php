@@ -62,19 +62,25 @@ class ScrudBag implements \IteratorAggregate, \Countable
         $this->set('route_name', $this->get('name_snake_case'));
         $this->set('route_path', Str::asRoutePath($this->get('name_snake_case')));
         $this->set('templates_path', $this->get('name_snake_case'));
-        $this->set('search_method', 'search');
-        $this->set('search_query_method', 'getSearchQuery');
+        
         if ($this->get('name_upper_camel_case') !== $this->get('entity_upper_camel_case')) {
-            $this->set('search_method', 'search'.$this->get('name_upper_camel_case'));
-            $this->set('search_query_method', 'getSearch'.$this->get('name_upper_camel_case').'Query');
+            $this->set('search_method', $this->get('name_upper_camel_case'));
+            $this->set('search_query_method', $this->get('name_upper_camel_case'));
         }
+        
         if ($this->get('config')['prefix_directory']) {
             $prefix = $this->get('config')['prefix_directory'];
             $this->set('file_translation_name', $prefix.'_'.$this->get('file_translation_name'));
             $this->set('entity_translation_name', $prefix.'_'.$this->get('entity_translation_name'));
             $this->set('templates_path', $prefix.'/'.$this->get('templates_path'));
             $this->set('route_name', $prefix.'_'.$this->get('route_name'));
+            $this->set('search_method', Str::asCamelCase($prefix).$this->get('search_method'));
+            $this->set('search_query_method', Str::asCamelCase($prefix).$this->get('search_query_method'));
         }
+        
+        $this->set('search_method', 'search'.$this->get('search_method'));
+        $this->set('search_query_method', 'get'.$this->get('search_query_method').'Query');
+        
         if (isset($this->get('config')['prefix_route']) && $this->get('config')['prefix_route']) {
             $prefix = $this->get('config')['prefix_route'];
             $this->set('route_path', '/'.$prefix.$this->get('route_path'));

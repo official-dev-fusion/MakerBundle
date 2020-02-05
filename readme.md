@@ -4,9 +4,9 @@ This bundle is a code generation tool. It draws heavily on the symfony/maker-bun
 
 It was designed to generate easily adaptable code respecting a SCRUD philosophy (search, create, read, update and delete) from a Doctrine entity.
 
-The df:make:config command generates a configuration.yaml file based on a given entity located in App\Entity. This file will be used later to generate the code. The file must be customized to generate the expected code. It ends up in the config/scrud folder.
+The df:scrud:config command generates a configuration.yaml file based on a given entity located in App\Entity. This file will be used later to generate the code. The file must be customized to generate the expected code. It ends up in the config/dev_fusion/scrud folder.
 
-The df:make:scrud command generates an advanced controller from a configuration file located in config/scrud. This controller allows you to perform the five basic operations on a model.
+The df:scrud:exec command generates an advanced controller from a configuration file located in config/dev_fusion/scrud. This controller allows you to perform the five basic operations on a model.
 
 * Search: List of all records, filter, pagination and multi-selection;
 * Read: Display of a given record identified by its primary key;
@@ -31,4 +31,5 @@ The df:make:scrud command generates an advanced controller from a configuration 
 * Modification of the repository linked to the entity to create search methods for the filter.
 
 ## Notes :
+
 You must add block content in base.html.twig

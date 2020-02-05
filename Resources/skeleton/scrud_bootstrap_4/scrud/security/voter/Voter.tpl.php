@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\Security;
 
 class <?= $class_name ?> extends Voter
 {
+    
     const SEARCH = '<?= $route_name ?>_search';
 <?php if ($config['create']['activate']): ?>
     const CREATE = '<?= $route_name ?>_create';
@@ -23,6 +24,7 @@ class <?= $class_name ?> extends Voter
 <?php if ($config['delete']['activate']): ?>
     const DELETE = '<?= $route_name ?>_delete';
 <?php endif ?>
+
     /**
      * @var Security
      */
@@ -99,7 +101,7 @@ class <?= $class_name ?> extends Voter
 <?php if ($config['create']['activate']): ?>
     private function canCreate($subject, User $user)
     {
-        return true;
+        return false;
     }
 
 <?php endif ?>
