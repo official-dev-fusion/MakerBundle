@@ -8,7 +8,7 @@ use <?= $repository_full_class_name ?>;
 <?php endif ?>
 <?php if ($config['create']['activate'] || $config['update']['activate']): ?>
 use <?= $form_full_class_name ?>;
-<?php if ($form_full_class_name !== $form_update_full_class_name): ?>
+<?php if (isset($form_update_full_class_name) && $form_full_class_name !== $form_update_full_class_name): ?>
 use <?= $form_update_full_class_name ?>;
 <?php endif ?>
 <?php endif ?>
@@ -36,7 +36,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 <?php endif ?>
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Route("<?= $route_path ?>")
