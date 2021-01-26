@@ -43,10 +43,10 @@ class ScrudConfiguration implements ConfigurationInterface
 
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('scrud_config');
+        $treeBuilder = new TreeBuilder('scrud_config');
+        
             
-        $entities = $rootNode
+        $entities = $treeBuilder->getRootNode()
             ->children()
                 ->arrayNode('entities')
                     ->useAttributeAsKey('name')

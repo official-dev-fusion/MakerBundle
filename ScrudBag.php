@@ -2,7 +2,7 @@
 
 namespace DF\MakerBundle;
 
-use Doctrine\Common\Inflector\Inflector;
+use Symfony\Component\String\Inflector\EnglishInflector as Inflector;
 use Symfony\Bundle\MakerBundle\Str;
 
 /**
@@ -26,11 +26,12 @@ class ScrudBag implements \IteratorAggregate, \Countable
         $this->set('config', $config);
         $name = Str::asCamelCase($config['name']);
         $this->set('name_upper_camel_case', $name);
-        $this->set('name_upper_camel_case_plural', Inflector::pluralize($this->get('name_upper_camel_case')));
+        $this->set('name_upper_camel_case_plural', Inflector::pluralize($this->get('name_upper_camel_case'))[0]);
         $this->set('name_lower_camel_case', Str::asLowerCamelCase($name));
-        $this->set('name_lower_camel_case_plural', Inflector::pluralize($this->get('name_lower_camel_case')));
+        $this->set('name_lower_camel_case_plural', Inflector::pluralize($this->get('name_lower_camel_case'))[0]);
         $this->set('name_snake_case', Str::asSnakeCase($name));
-        $this->set('name_snake_case_plural', Inflector::pluralize($this->get('name_snake_case')));
+        
+        $this->set('name_snake_case_plural', Inflector::pluralize($this->get('name_snake_case'))[0]);
         $this->set('name_human_words', str_replace('_', ' ', $this->get('name_snake_case')));
         $this->set('name_human_words_ucfirst', ucfirst($this->get('name_human_words')));
         $this->set('name_human_words_plural', str_replace('_', ' ', $this->get('name_snake_case_plural')));
@@ -38,19 +39,19 @@ class ScrudBag implements \IteratorAggregate, \Countable
         $this->setElement('entity', $entityClassDetails, true);
         $this->set('entity_first_letter', substr($this->get('entity_lower_camel_case'), 0, 1));
         $this->set('entity_identifier_snake_case', $entityDoctrineDetails->getIdentifier());
-        $this->set('entity_identifier_snake_case_plural', Inflector::pluralize($entityDoctrineDetails->getIdentifier()));
+        $this->set('entity_identifier_snake_case_plural', Inflector::pluralize($entityDoctrineDetails->getIdentifier())[0]);
         $this->set('entity_identifier_lower_camel_case', Str::asLowerCamelCase($entityDoctrineDetails->getIdentifier()));
-        $this->set('entity_identifier_lower_camel_case_plural', Inflector::pluralize(Str::asLowerCamelCase($entityDoctrineDetails->getIdentifier())));
+        $this->set('entity_identifier_lower_camel_case_plural', Inflector::pluralize(Str::asLowerCamelCase($entityDoctrineDetails->getIdentifier()))[0]);
         $this->set('entity_identifier_upper_camel_case', Str::asCamelCase($entityDoctrineDetails->getIdentifier()));
-        $this->set('entity_identifier_upper_camel_case_plural', Inflector::pluralize(Str::asCamelCase($entityDoctrineDetails->getIdentifier())));
+        $this->set('entity_identifier_upper_camel_case_plural', Inflector::pluralize(Str::asCamelCase($entityDoctrineDetails->getIdentifier()))[0]);
         $this->set('entity_human_words', str_replace('_', ' ', $this->get('entity_snake_case')));
         $this->set('entity_human_words_ucfirst', ucfirst($this->get('entity_human_words')));
-        $this->set('entity_human_words_plural', str_replace('_', ' ', $this->get('entity_snake_case_plural')));
+        $this->set('entity_human_words_plural', str_replace('_', ' ', $this->get('entity_snake_case_plural'))[0]);
         $this->set('entity_human_words_plural_ucfirst', ucfirst($this->get('entity_human_words_plural')));
         if (null !== $repositoryClassDetails) {
             $this->set('repository_full_class_name', $repositoryClassDetails->getFullName());
             $this->set('repository_upper_camel_case', $repositoryClassDetails->getShortName());
-            $this->set('repository_lower_camel_case', lcfirst(Inflector::singularize($repositoryClassDetails->getShortName())));
+            $this->set('repository_lower_camel_case', lcfirst(Inflector::singularize($repositoryClassDetails->getShortName())[0]));
         }
         $this->setConfig();
     }
@@ -94,12 +95,12 @@ class ScrudBag implements \IteratorAggregate, \Countable
     {
         $this->set($elementName.'_full_class_name', $classDetails->getFullName());
         $this->set($elementName.'_upper_camel_case', $classDetails->getShortName());
-        $this->set($elementName.'_lower_camel_case', lcfirst(Inflector::singularize($classDetails->getShortName())));
+        $this->set($elementName.'_lower_camel_case', lcfirst(Inflector::singularize($classDetails->getShortName())[0]));
         $this->set($elementName.'_snake_case', Str::asTwigVariable($classDetails->getShortName()));
         if ($pluralize) {
-            $this->set($elementName.'_upper_camel_case_plural', Inflector::pluralize($classDetails->getShortName()));
-            $this->set($elementName.'_lower_camel_case_plural', lcfirst(Inflector::pluralize($classDetails->getShortName())));
-            $this->set($elementName.'_snake_case_plural', Inflector::pluralize(Str::asTwigVariable($classDetails->getShortName())));
+            $this->set($elementName.'_upper_camel_case_plural', Inflector::pluralize($classDetails->getShortName())[0]);
+            $this->set($elementName.'_lower_camel_case_plural', lcfirst(Inflector::pluralize($classDetails->getShortName())[0]));
+            $this->set($elementName.'_snake_case_plural', Inflector::pluralize(Str::asTwigVariable($classDetails->getShortName()))[0]);
         }
     }
     
@@ -162,8 +163,14 @@ class ScrudBag implements \IteratorAggregate, \Countable
      * @param string $key   The key
      * @param mixed  $value The value
      */
-    public function set($key, $value)
+    public function set(string $key, $value)
     {
+        if (is_array($value) && $key != 'config') {
+            
+            var_dump($key);
+            throw new \Exception();
+            die();
+        }
         $this->parameters[$key] = $value;
     }
 
