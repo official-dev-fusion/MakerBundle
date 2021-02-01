@@ -35,4 +35,22 @@
         $href .= ") }}";
         return $href;
     }
+    
+    function isOneOrMoreAction (array $config)
+    {
+        return ($config['read']['activate'] or $config['update']['activate'] or $config['delete']['activate']);
+    }
+    
+    function isSearchActionActivated (array $config)
+    {
+        return $config['search']['action']['activate'];
+    }
+    
+    function isSearchActionPosition (array $config, string $position)
+    {
+        if (!isSearchActionActivated($config) or !isOneOrMoreAction($config)) {
+            return false;
+        }
+        return $config['search']['action']['position'] == $position;
+    }
 ?>

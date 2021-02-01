@@ -175,6 +175,17 @@ class ScrudConfiguration implements ConfigurationInterface
                             ->end()
                         ->end()
                     ->end()
+                    ->arrayNode('action')
+                        ->isRequired()
+                        ->children()
+                            ->booleanNode('activate')
+                                ->isRequired()
+                            ->end()
+                            ->enumNode('position')
+                                ->values(['right', 'left'])
+                            ->end()
+                        ->end()
+                    ->end()
                     ->booleanNode('pagination')
                         ->isRequired()
                     ->end()
@@ -372,7 +383,19 @@ class ScrudConfiguration implements ConfigurationInterface
                 ]
             ];
         }
+        
+        if (!isset($values['search']['action'])) {
+            $values['search']['action'] = [];
+        }
 
+        if (!isset($values['search']['action']['activate'])) {
+            $values['search']['action']['activate'] = true;
+        }
+        
+        if (!isset($values['search']['action']['position'])) {
+            $values['search']['action']['position'] = 'right';
+        }
+        
         if (!isset($values['create'])) {
             $values['create'] = [];
         }
