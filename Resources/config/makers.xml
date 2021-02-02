@@ -18,6 +18,11 @@
                 <argument type="service" id="maker.doctrine_helper" />
                 <tag name="maker.command" />
             </service>
+            <service id="df.scrud.config-debug" class="DF\MakerBundle\Maker\ScrudConfigDebug">
+                <argument type="service" id="service_container" />
+                <argument type="service" id="maker.doctrine_helper" />
+                <tag name="maker.command" />
+            </service>
             <service id="df.form.exec" class="DF\MakerBundle\Maker\FormExec">
                 <argument type="service" id="service_container" />
                 <argument type="service" id="maker.file_manager" />

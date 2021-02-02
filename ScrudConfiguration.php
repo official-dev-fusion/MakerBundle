@@ -6,11 +6,10 @@ use Exception;
 use Symfony\Bundle\MakerBundle\Doctrine\DoctrineHelper;
 use Symfony\Bundle\MakerBundle\Doctrine\EntityDetails;
 use Symfony\Bundle\MakerBundle\Generator;
+use Symfony\Bundle\MakerBundle\Str;
+use Symfony\Bundle\MakerBundle\Validator;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Bundle\MakerBundle\Validator;
-use Symfony\Component\Validator\Constraints\Valid;
-use Symfony\Bundle\MakerBundle\Str;
 
 class ScrudConfiguration implements ConfigurationInterface
 {
@@ -32,8 +31,8 @@ class ScrudConfiguration implements ConfigurationInterface
     private $generator;
 
     public static $defaultFieldOptions = ['property', 'type', 'label_key_trans', 'label', 'twig_filters', ];
-    
-    public static $defaultFormOptions = [ 'property', 'type', 'type_options', 'type_class', 'label_key_trans', 'label' ];
+
+    public static $defaultFormOptions = ['property', 'type', 'type_options', 'type_class', 'label_key_trans', 'label'];
 
     public function __construct(DoctrineHelper $doctrineHelper, Generator $generator)
     {
@@ -44,8 +43,7 @@ class ScrudConfiguration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder('scrud_config');
-        
-            
+
         $entities = $treeBuilder->getRootNode()
             ->children()
                 ->arrayNode('entities')
@@ -64,38 +62,38 @@ class ScrudConfiguration implements ConfigurationInterface
         $validFields = function ($values) {
             foreach ($values as $key => $value) {
                 if (!in_array($key, self::$defaultFieldOptions)) {
-                    throw new \LogicException(sprintf("%s invalid options.", $key));
+                    throw new \LogicException(sprintf('%s invalid options.', $key));
                 }
             }
             foreach (self::$defaultFieldOptions as $option) {
                 if (!array_key_exists($option, $values)) {
-                    throw new Exception(sprintf("The option %s is required (%s).", $option, print_r($values, true)));
+                    throw new Exception(sprintf('The option %s is required (%s).', $option, print_r($values, true)));
                 }
             }
             if (null !== $values['twig_filters'] && !is_array($values['twig_filters'])) {
-                throw new \LogicException("The twig_filters option must be of type array or null.");
+                throw new \LogicException('The twig_filters option must be of type array or null.');
             }
             return $values;
         };
-        
+
         $validForms = function ($values) {
             if (!count($values)) {
                 return $values;
             }
             foreach ($values as $key => $value) {
                 if (!in_array($key, self::$defaultFormOptions)) {
-                    throw new \LogicException(sprintf("%s invalid options.", $key));
+                    throw new \LogicException(sprintf('%s invalid options.', $key));
                 }
             }
             foreach (self::$defaultFormOptions as $option) {
                 if (!array_key_exists($option, $values)) {
-                    throw new Exception(sprintf("The option %s is required (%s).", $option, print_r($values, true)));
+                    throw new Exception(sprintf('The option %s is required (%s).', $option, print_r($values, true)));
                 }
             }
-            
+
             return $values;
         };
-        
+
         $node
             ->scalarNode('class')
                 ->isRequired()
@@ -155,8 +153,8 @@ class ScrudConfiguration implements ConfigurationInterface
                             ->always()
                             ->then(static function ($values) {
                                 foreach ($values as $key => $value) {
-                                    if (!in_array($key, [ 'by', 'direction', ])) {
-                                        throw new \LogicException(sprintf("%s invalid options.", $key));
+                                    if (!in_array($key, ['by', 'direction', ])) {
+                                        throw new \LogicException(sprintf('%s invalid options.', $key));
                                     }
                                 }
                                 return $values;
@@ -309,7 +307,7 @@ class ScrudConfiguration implements ConfigurationInterface
                     );
                 }
             }
-            
+
             if ($values['update']['multi_select']) {
                 if (!$values['update']['activate']) {
                     throw new \LogicException(
@@ -346,7 +344,10 @@ class ScrudConfiguration implements ConfigurationInterface
         if (!isset($values['voter'])) {
             $values['voter'] = false;
         }
-        
+
+        $values = $this->normalizeFields($values, $entityDoctrineDetails);
+        $values = $this->normalizeForms($values, $entityDoctrineDetails);
+
         if (!isset($values['search'])) {
             $values['search'] = [];
         }
@@ -362,7 +363,7 @@ class ScrudConfiguration implements ConfigurationInterface
         if (!isset($values['search']['filter_view'])) {
             $values['search']['filter_view'] = [];
         }
-        
+
         if (!isset($values['search']['filter_view']['activate'])) {
             $values['search']['filter_view']['activate'] = true;
         }
@@ -383,7 +384,7 @@ class ScrudConfiguration implements ConfigurationInterface
                 ]
             ];
         }
-        
+
         if (!isset($values['search']['action'])) {
             $values['search']['action'] = [];
         }
@@ -391,11 +392,11 @@ class ScrudConfiguration implements ConfigurationInterface
         if (!isset($values['search']['action']['activate'])) {
             $values['search']['action']['activate'] = true;
         }
-        
+
         if (!isset($values['search']['action']['position'])) {
             $values['search']['action']['position'] = 'right';
         }
-        
+
         if (!isset($values['create'])) {
             $values['create'] = [];
         }
@@ -411,11 +412,11 @@ class ScrudConfiguration implements ConfigurationInterface
         if (!isset($values['read']['activate'])) {
             $values['read']['activate'] = true;
         }
-        
+
         if (!isset($values['read']['action_up'])) {
             $values['read']['action_up'] = false;
         }
-        
+
         if (!isset($values['read']['action_down'])) {
             $values['read']['action_down'] = false;
         }
@@ -444,18 +445,43 @@ class ScrudConfiguration implements ConfigurationInterface
             $values['delete']['multi_select'] = true;
         }
 
-        $values = $this->normalizeFields($values, $entityDoctrineDetails);
-        $values = $this->normalizeForms($values, $entityDoctrineDetails);
+        return $this->sortData($values);
+    }
 
+    const ORDER = [
+        'class' => 0,
+        'skeleton' => 1,
+        'prefix_directory' => 2,
+        'prefix_route' => 3,
+        'voter' => 4,
+        'fields' => 5,
+        'forms' => 6,
+        'search' => 7,
+        'create' => 8,
+        'read' => 9,
+        'update' => 10,
+        'delete' => 11,
+    ];
+
+    private function sortData($values)
+    {
+        $cmp = function ($a, $b) {
+            if ($a == $b) {
+                return 0;
+            }
+
+            return (ScrudConfiguration::ORDER[$a] < ScrudConfiguration::ORDER[$b]) ? -1 : 1;
+        };
+        uksort($values, $cmp);
         return $values;
     }
 
     private function normalizeFields(array $values, EntityDetails $entityDoctrineDetails)
     {
         $defaultFields = $this->getDefaultFields($entityDoctrineDetails);
-        
+
         $fields = $values['fields'] ?? null;
-        
+
         if (!$fields) {
             foreach ($defaultFields as $defaultField) {
                 $fields[] = $defaultField;
@@ -463,7 +489,7 @@ class ScrudConfiguration implements ConfigurationInterface
         } else {
             $fields = $this->overwriteFields($defaultFields, $fields);
         }
-        
+
         $searchFields = $values['search']['fields'] ?? null;
         if (!$searchFields) {
             $searchFields = $fields;
@@ -477,11 +503,11 @@ class ScrudConfiguration implements ConfigurationInterface
         } else {
             $readFields = $this->overwriteFields($defaultFields, $readFields);
         }
-        
+
         $values['fields'] = $fields;
         $values['search']['fields'] = $searchFields;
         $values['read']['fields'] = $readFields;
-        
+
         $stringFields = [];
         foreach ($searchFields as $field) {
             if ($field['type'] === 'string' || $field['type'] === 'text') {
@@ -515,15 +541,15 @@ class ScrudConfiguration implements ConfigurationInterface
     {
         switch ($type) {
             case 'text':
-                return [ "nl2br", ];
+                return ['nl2br', ];
             case 'datetime':
-                return [ "format_datetime", ];
+                return ['format_datetime', ];
             case 'date':
-                return [ "format_date", ];
+                return ['format_date', ];
             case 'time':
-                return [ "format_time", ];
+                return ['format_time', ];
             case 'decimal':
-                return [ "format_number", ];
+                return ['format_number', ];
         }
         return null;
     }
@@ -616,11 +642,11 @@ class ScrudConfiguration implements ConfigurationInterface
         } else {
             $forms = $this->overwriteForms($defaultForms, $forms);
         }
-        
+
         $values['forms'] = $forms;
         $values['create']['forms'] = $createForms;
         $values['update']['forms'] = $updateForms;
-        
+
         return $values;
     }
 
@@ -666,7 +692,7 @@ class ScrudConfiguration implements ConfigurationInterface
                 } else {
                     return 'TextType';
                 }
-                
+
                 // no break
             case 'text': return 'TextareaType';
             case 'date':
@@ -691,7 +717,7 @@ class ScrudConfiguration implements ConfigurationInterface
             default: return 'Symfony\\Component\\Form\\Extension\\Core\\Type\\'.$type;
         }
     }
-    
+
     private function overwriteForms(array $defaultForms, array $forms)
     {
         foreach ($forms as $key => &$form) {
