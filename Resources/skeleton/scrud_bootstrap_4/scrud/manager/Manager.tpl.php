@@ -83,13 +83,11 @@ class <?= $class_name ?><?= "\n" ?>
      */
     public function configFormFilter(FormInterface $form)
     {
-        $request = $this->requestStack->getCurrentRequest();
-        $page = $request->get('page');
-        if (!$page) { $page = $this->session->get('<?= $route_name ?>_page', 1); }
+<?php if ($config['search']['pagination']): ?>
+        $page = $this->requestStack->getCurrentRequest()->get('page', $this->session->get('<?= $route_name ?>_page', 1));
         $this->session->set('<?= $route_name ?>_page', $page);
-        if($request->isMethod('POST') && $request->query->get('<?= $route_name ?>_search')) {
-            $form->submit($request->query->get('<?= $route_name ?>_search'));
-        } elseif(!$form->getData()) {
+<?php endif ?>        
+        if(!$form->getData()) {
             $form->setData($this->getDefaultFormSearchData());
         }
         if ($form->isSubmitted() && $form->isValid()) {
