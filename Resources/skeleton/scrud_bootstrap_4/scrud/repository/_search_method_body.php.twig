@@ -1,7 +1,7 @@
 <?php
 {% if config.search.pagination %}
     if ((int) $page < 1) {
-        throw new \InvalidArgumentException(sprintf("The page argument can not be less than 1 (value : %s)",$page));
+        throw new \InvalidArgumentException(sprintf('The page argument can not be less than 1 (value : %s)', $page));
     }
 {% if config.search.filter_view.activate %}
     $firstResult = ($page - 1) * $data['number_by_page'];
@@ -21,15 +21,18 @@ $query
 {% endfor %}
 {% if config.search.pagination %}
     $paginator = new Paginator($query);
-    if ($paginator->count() <= $firstResult && $page != 1) {
+    if ($paginator->count() <= $firstResult && 1 != $page) {
         if (!$request->get('page')) {
             $session->set('{{ route_name }}_page', --$page);
+
             return $this->search($request, $session, {% if config.search.filter_view.activate %}$data, {% endif %}$page);
         } else {
             throw new NotFoundHttpException();
         }
     }
+
     return $paginator;
 {% else %}
+
     return $query->getQuery()->getResult();
 {% endif %}

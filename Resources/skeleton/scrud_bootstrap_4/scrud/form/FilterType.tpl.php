@@ -3,9 +3,9 @@
 namespace <?= $namespace ?>;
 
 use <?= $manager_full_class_name ?>;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -41,7 +41,7 @@ class <?= $class_name ?> extends AbstractType
             'translation_domain' => '<?= $file_translation_name ?>',
         ]);
     }
-    
+
     public function getBlockPrefix()
     {
         return 'filter';

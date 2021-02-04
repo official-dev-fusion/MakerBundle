@@ -3,33 +3,31 @@
 namespace <?= $namespace ?>;
 
 use <?= $entity_full_class_name ?>;
-<?php if (isset($repository_full_class_name)): ?>
-use <?= $repository_full_class_name ?>;
-<?php endif ?>
-<?php if ($config['create']['activate'] || $config['update']['activate']): ?>
-use <?= $form_full_class_name ?>;
-<?php if (isset($form_update_full_class_name) && $form_full_class_name !== $form_update_full_class_name): ?>
-use <?= $form_update_full_class_name ?>;
-<?php endif ?>
-<?php endif ?>
-<?php if ($config['search']['filter_view']['activate'] or $config['search']['multi_select']): ?>
-use <?= $manager_full_class_name ?>;
+<?php if ($config['update']['multi_select']): ?>
+use <?= $form_batch_full_class_name ?>;
+use <?= $form_collection_update_full_class_name ?>;
 <?php endif ?>
 <?php if ($config['search']['filter_view']['activate']): ?>
 use <?= $form_filter_full_class_name ?>;
 <?php endif ?>
-<?php if ($config['update']['multi_select']): ?>
-use <?= $form_collection_update_full_class_name ?>;
+<?php if (isset($form_update_full_class_name) && $form_full_class_name !== $form_update_full_class_name): ?>
+use <?= $form_update_full_class_name ?>;
 <?php endif ?>
-<?php if ($config['search']['multi_select']): ?>
-use <?= $form_batch_full_class_name ?>;
+<?php if ($config['create']['activate'] || $config['update']['activate']): ?>
+use <?= $form_full_class_name ?>;
 <?php endif ?>
-<?php if ($config['delete']['multi_select']): ?>
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormError;
+<?php if ($config['search']['filter_view']['activate'] or $config['search']['multi_select']): ?>
+use <?= $manager_full_class_name ?>;
+<?php endif ?>
+<?php if (isset($repository_full_class_name)): ?>
+use <?= $repository_full_class_name ?>;
 <?php endif ?>
 use Symfony\Bundle\FrameworkBundle\Controller\<?= $parent_class_name ?>;
+<?php if ($config['delete']['multi_select']): ?>
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+<?php endif ?>
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 <?php if ($config['search']['filter_view']['activate'] || $config['search']['pagination']): ?>
@@ -43,27 +41,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class <?= $class_name ?> extends <?= $parent_class_name; ?><?= "\n" ?>
 {
-
     /**
-     * 
      * @var <?= $repository_upper_camel_case ?>
      */
     private $<?= $repository_lower_camel_case ?>;
-    
+
 <?php if ($config['search']['filter_view']['activate'] or $config['search']['multi_select']): ?>
     /**
-     * 
      * @var <?= $manager_upper_camel_case ?>
      */
     private $<?= $manager_lower_camel_case ?>;
-    
+
 <?php endif ?>
     /**
-     * 
-     * @var TranslatorInterface 
+     * @var TranslatorInterface
      */
     private $translator;
-    
+
     public function __construct(<?= $repository_upper_camel_case ?> $<?= $repository_lower_camel_case ?>, <?php if ($config['search']['filter_view']['activate'] or $config['search']['multi_select']): ?><?= $manager_upper_camel_case ?> $<?= $manager_lower_camel_case ?>, <?php endif ?>TranslatorInterface $translator)
     {
         $this-><?= $repository_lower_camel_case ?> = $<?= $repository_lower_camel_case ?>;
@@ -87,21 +81,21 @@ if ($config['search']['filter_view']['activate'] or $config['search']['paginatio
     $array_param[] = 'Session $session';
 }
 if ($config['search']['pagination']) {
-    $array_param[] = '$page=null';
+    $array_param[] = '$page = null';
 }
 $controller_search_method_param = implode(', ', $array_param);
 ?>
     public function search(<?= $controller_search_method_param ?>)
     {
 <?php if ($config['search']['pagination']): ?>
-        if (!$page) { $page = $session->get('<?= $route_name ?>_page', 1); }
+        $page ?: $page = $session->get('<?= $route_name ?>_page', 1);
 <?php if (!$config['search']['filter_view']['activate']): ?>
         $session->set('<?= $route_name ?>_page', $page);
         $numberByPage = 15;
 <?php endif ?>
 <?php endif ?>
 <?php if ($config['search']['filter_view']['activate']): ?>
-        $formFilter = $this->createForm(<?= $form_filter_upper_camel_case ?>::class, null, [ 'action' => $this->generateUrl('<?= $route_name ?>_search'<?php if ($config['search']['pagination']): ?>, [ 'page' => 1 ]<?php endif ?>),]);
+        $formFilter = $this->createForm(<?= $form_filter_upper_camel_case ?>::class, null, ['action' => $this->generateUrl('<?= $route_name ?>_search'<?php if ($config['search']['pagination']): ?>, ['page' => 1]<?php endif ?>)]);
         $formFilter->handleRequest($request);
         $data = $this-><?= $manager_lower_camel_case ?>->configFormFilter($formFilter)->getData();
 <?php endif ?>
@@ -136,17 +130,20 @@ $repository_search_method_param = implode(', ', $array_param);
 <?php if ($config['search']['multi_select']): ?>
         $formBatch = $this->createForm(<?= $form_batch_upper_camel_case ?>::class, null, [
             'action' => $this->generateUrl('<?= $route_name ?>_search'<?php
-                if ($config['search']['filter_view']['activate'] and $config['search']['pagination']): ?>, array_merge([ 'page' => $page ], $queryData)<?php
-                elseif ($config['search']['pagination']): ?>, [ 'page' => $page ]<?php
+                if ($config['search']['filter_view']['activate'] and $config['search']['pagination']): ?>, array_merge(['page' => $page], $queryData)<?php
+                elseif ($config['search']['pagination']): ?>, ['page' => $page]<?php
                 endif ?>),
             '<?= $entity_snake_case_plural ?>' => $<?= $entity_lower_camel_case_plural ?>,
         ]);
         $formBatch->handleRequest($request);
         if ($formBatch->isSubmitted() && $formBatch->isValid()) {
             $url = $this-><?= $manager_lower_camel_case ?>->dispatchBatchForm($formBatch);
-            if ($url) { return $this->redirect($url); }
+            if ($url) {
+                return $this->redirect($url);
+            }
         }
 <?php endif ?>
+
         return $this->render('<?= $templates_path ?>/search/index.html.twig', [
             '<?= $entity_snake_case_plural ?>' => $<?= $entity_lower_camel_case_plural ?>,
 <?php if ($config['search']['filter_view']['activate']): ?>
@@ -187,8 +184,9 @@ else: ?>$numberByPage<?php endif ?>) ?: 1,
             $em = $this->getDoctrine()->getManager();
             $em->persist($<?= $entity_lower_camel_case ?>);
             $em->flush();
-            $msg = $this->translator->trans('<?= $name_snake_case ?>.create.flash.success', [ '%identifier%' => $<?= $entity_lower_camel_case ?>, ], '<?= $file_translation_name ?>');
+            $msg = $this->translator->trans('<?= $name_snake_case ?>.create.flash.success', ['%identifier%' => $<?= $entity_lower_camel_case ?>], '<?= $file_translation_name ?>');
             $this->addFlash('success', $msg);
+
             return $this->redirectToRoute('<?= $route_name ?>_search');
         }
 
@@ -208,6 +206,7 @@ else: ?>$numberByPage<?php endif ?>) ?: 1,
 <?php if ($config['voter']): ?>
         $this->denyAccessUnlessGranted('<?= $route_name ?>_read', $<?= $entity_lower_camel_case ?>);
 <?php endif ?>
+
         return $this->render('<?= $templates_path ?>/read.html.twig', [
             '<?= $entity_snake_case ?>' => $<?= $entity_lower_camel_case ?>,
 <?php if ($config['read']['action_up'] or $config['read']['action_down']): ?>
@@ -230,7 +229,7 @@ else: ?>$numberByPage<?php endif ?>) ?: 1,
 <?php if ($config['voter']): ?>
         $this->denyAccessUnlessGranted('<?= $route_name ?>_update', $<?= $entity_lower_camel_case_plural ?>);
 <?php endif ?>
-        $form = $this->createForm(<?= $form_collection_update_upper_camel_case ?>::class, null, [ '<?= $entity_snake_case_plural ?>' => $<?= $entity_lower_camel_case_plural ?>, ]);
+        $form = $this->createForm(<?= $form_collection_update_upper_camel_case ?>::class, null, ['<?= $entity_snake_case_plural ?>' => $<?= $entity_lower_camel_case_plural ?>]);
 <?php else: ?>
 
     /**
@@ -249,6 +248,7 @@ else: ?>$numberByPage<?php endif ?>) ?: 1,
             $this->getDoctrine()->getManager()->flush();
             $msg = $this->translator->trans('<?= $name_snake_case ?>.update.flash.success', [], '<?= $file_translation_name ?>');
             $this->addFlash('success', $msg);
+
             return $this->redirectToRoute('<?= $route_name ?>_search');
         }
 
@@ -269,7 +269,7 @@ else: ?>$numberByPage<?php endif ?>) ?: 1,
      * @Route("/delete", name="<?= $route_name ?>_delete", methods="GET|POST")
      */
     public function delete(Request $request): Response
-    {    
+    {
         $<?= $entity_lower_camel_case_plural ?> = $this-><?= $manager_lower_camel_case ?>->get<?= $entity_upper_camel_case_plural ?>();
 <?php if ($config['voter']): ?>
         $this->denyAccessUnlessGranted('<?= $route_name ?>_delete', $<?= $entity_lower_camel_case_plural ?>);
@@ -282,11 +282,10 @@ else: ?>$numberByPage<?php endif ?>) ?: 1,
             }
         });
         $form = $formBuilder->getForm();
-        
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
-            foreach($<?= $entity_lower_camel_case_plural ?> as $<?= $entity_lower_camel_case ?>) { 
+            foreach ($<?= $entity_lower_camel_case_plural ?> as $<?= $entity_lower_camel_case ?>) {
                 $em->remove($<?= $entity_lower_camel_case ?>);
             }
             try {
@@ -295,8 +294,10 @@ else: ?>$numberByPage<?php endif ?>) ?: 1,
             } catch (\Doctrine\DBAL\DBALException $e) {
                 $this->addFlash('warning', $e->getMessage());
             }
+
             return $this->redirectToRoute('<?= $route_name ?>_search');
         }
+
         return $this->render('<?= $templates_path ?>/delete.html.twig', [
             '<?= $entity_snake_case_plural ?>' => $<?= $entity_lower_camel_case_plural ?>,
             'form' => $form->createView(),
@@ -314,7 +315,6 @@ else: ?>$numberByPage<?php endif ?>) ?: 1,
 <?php endif ?>
         $formBuilder = $this->createFormBuilder();
         $form = $formBuilder->getForm();
-        
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $msg = $this->translator->trans('<?= $name_snake_case ?>.delete.flash.success', [ '%identifier%' => $<?= $entity_lower_camel_case ?>, ], '<?= $file_translation_name ?>');
@@ -327,6 +327,7 @@ else: ?>$numberByPage<?php endif ?>) ?: 1,
                 $this->addFlash('warning', $e->getMessage());
             }
         }
+
         return $this->redirectToRoute('<?= $route_name ?>_search');
     }
 <?php endif ?>

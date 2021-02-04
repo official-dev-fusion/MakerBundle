@@ -5,12 +5,11 @@ namespace <?= $namespace; ?>;
 use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class <?= $class_name ?> extends Voter
 {
-    
     const SEARCH = '<?= $route_name ?>_search';
 <?php if ($config['create']['activate']): ?>
     const CREATE = '<?= $route_name ?>_create';
@@ -29,17 +28,14 @@ class <?= $class_name ?> extends Voter
      * @var Security
      */
     private $security;
-    
-    /** 
-     * @param Security $security
-     */
+
     public function __construct(Security $security)
     {
         $this->security = $security;
     }
-    
+
     protected function supports($attribute, $subject)
-    {        
+    {
         return in_array($attribute, [
             self::SEARCH,
 <?php if ($config['create']['activate']): ?>
@@ -52,7 +48,7 @@ class <?= $class_name ?> extends Voter
             self::UPDATE,
 <?php endif ?>
 <?php if ($config['delete']['activate']): ?>
-            self::DELETE
+            self::DELETE,
 <?php endif ?>
         ]);
     }
@@ -64,7 +60,7 @@ class <?= $class_name ?> extends Voter
         if (!$user instanceof UserInterface) {
             return false;
         }
-        
+
         if ($this->security->isGranted('ROLE_ADMIN')) {
             return true;
         }
@@ -92,7 +88,7 @@ class <?= $class_name ?> extends Voter
         }
         throw new \LogicException('This code should not be reached!');
     }
-    
+
     private function canSearch($subject, User $user)
     {
         return true;

@@ -2,13 +2,12 @@
 
 namespace <?= $namespace ?>;
 
-use <?= $form_full_class_name ?>;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class <?= $class_name ?> extends AbstractType
 {
@@ -24,7 +23,7 @@ class <?= $class_name ?> extends AbstractType
                 'data' => $options['<?= $entity_snake_case_plural ?>'],
             ]);
     }
-    
+
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -32,12 +31,11 @@ class <?= $class_name ?> extends AbstractType
             'translation_domain' => '<?= $file_translation_name ?>',
         ]);
     }
-    
+
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        foreach ($view['<?= $entity_snake_case_plural ?>']->children as $i => $childView)
-        {
+        foreach ($view['<?= $entity_snake_case_plural ?>']->children as $i => $childView) {
             $childView->vars['label'] = $options['<?= $entity_snake_case_plural ?>'][$i]->__toString();
         }
-    }   
+    }
 }

@@ -12,7 +12,7 @@ if (null !== ($data['search'] ?? null)) {
         {% for field in config.search.filter_view.str_fields %}
             ->add($query->expr()->like('{{ entity_first_letter ~ '.' ~ field }}', ':search')){{ loop.last ? ';' : '' }}
         {% endfor %}
-    
+
     $query
 {% if config.search.dql_filter %}
         ->andWhere($exprOrX)
@@ -24,4 +24,5 @@ if (null !== ($data['search'] ?? null)) {
 
 {% endif %}
 {% endif %}
+
 return $query;

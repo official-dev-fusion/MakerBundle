@@ -60,6 +60,8 @@
                 $type_full_class_names[] = $form['type_class'];
             }
         }
+        sort($type_full_class_names, SORT_NATURAL | SORT_FLAG_CASE);
+        
         return $type_full_class_names;
     }
 ?>

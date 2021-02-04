@@ -5,32 +5,26 @@ namespace <?= $namespace ?>;
 use <?= $entity_full_class_name ?>;
 use <?= $manager_full_class_name ?>;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class <?= $class_name ?> extends AbstractType
 {
-    
     /**
-     * 
      * @var <?= $manager_upper_camel_case ?>
      */
     private $<?= $manager_lower_camel_case ?>;
-    
-    /**
-     *
-     * @param <?= $manager_upper_camel_case ?> $<?= $manager_lower_camel_case ?> 
-     */
+
     public function __construct(<?= $manager_upper_camel_case ?> $<?= $manager_lower_camel_case ?>)
     {
         $this-><?= $manager_lower_camel_case ?> = $<?= $manager_lower_camel_case ?>;
     }
-    
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -55,7 +49,7 @@ class <?= $class_name ?> extends AbstractType
                 ],
                 'multiple' => false,
             ])
-            ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {            
+            ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
                 $result = $this-><?= $manager_lower_camel_case ?>->validationBatchForm($event->getForm());
                 if (true !== $result) {
                     $event->getForm()->addError(new FormError($result));

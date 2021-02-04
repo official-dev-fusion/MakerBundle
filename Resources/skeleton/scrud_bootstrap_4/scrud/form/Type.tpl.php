@@ -8,10 +8,10 @@ namespace <?= $namespace ?>;
 ?>
 
 use <?= $entity_full_class_name ?>;
+use Symfony\Component\Form\AbstractType;
 <?php foreach ($type_full_class_names as $type_full_class_name): ?>
 use <?= $type_full_class_name ?>;
 <?php endforeach; ?>
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
