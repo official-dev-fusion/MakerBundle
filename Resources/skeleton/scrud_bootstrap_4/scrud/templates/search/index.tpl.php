@@ -55,40 +55,40 @@
     </div>
 {% endif %}
 <?php endif ?>
-<section class="pt-4 pb-4">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-6">
-                <h1 class="h3">{{ '<?= $name_snake_case ?>.search.h1'|trans() }}</h1>
-            </div>
-            <div class="col-sm-6 text-right">
-                <p>
+    <section class="pt-4 pb-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h1 class="h3">{{ '<?= $name_snake_case ?>.search.h1'|trans() }}</h1>
+                </div>
+                <div class="col-sm-6 text-right">
+                    <p>
 <?php if ($config['create']['activate']) : ?>
-                    {% if can_create %}
-                        <a href="{{ path('<?= $route_name ?>_create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> {{ 'button.create'|trans() }}
-                        </a>
-                    {% endif %}
+                        {% if can_create %}
+                            <a href="{{ path('<?= $route_name ?>_create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> {{ 'button.create'|trans() }}
+                            </a>
+                        {% endif %}
 <?php endif ?>
-                </p>
+                    </p>
+                </div>
             </div>
-        </div>
-        <hr>
+            <hr>
 <?php if ($config['search']['filter_view']['activate']) : ?>
 
-        {% if can_filter %}
-            {{ include('<?= $templates_path ?>/search/_filter.html.twig') }}
-        {% endif %}
+            {% if can_filter %}
+                {{ include('<?= $templates_path ?>/search/_filter.html.twig') }}
+            {% endif %}
 <?php endif ?>
 
-        {{ include('<?= $templates_path ?>/search/_list.html.twig') }}
+            {{ include('<?= $templates_path ?>/search/_list.html.twig') }}
 <?php if ($config['search']['pagination']) : ?>
 
-        {{ include('<?= $templates_path ?>/search/_pagination.html.twig') }}
+            {{ include('<?= $templates_path ?>/search/_pagination.html.twig') }}
 <?php endif ?>
 
-    </div>
-</section>
+        </div>
+    </section>
 {% endblock %}
 
 <?php if ($config['delete']['activate'] or $config['search']['multi_select']): ?>

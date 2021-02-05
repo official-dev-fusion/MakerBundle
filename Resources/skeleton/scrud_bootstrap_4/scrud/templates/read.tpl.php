@@ -49,96 +49,96 @@
 
 <?php endif; ?>
 <?php endif; ?>
-<section class="pt-4 pb-4">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-6">
-                <h1 class="h3">{{ '<?= $name_snake_case ?>.read.h1'|trans({ '%identifier%': <?= $entity_snake_case ?> }) }}</h1>
-            </div>
-            <div class="col-sm-6 text-right">
-                <p>
-                    <a href="{{ path('<?= $route_name ?>_search') }}" class="btn btn-primary" role="button">
-                        <i class="fas fa-reply"></i> {{ 'button.back'|trans() }}
-                    </a>
+    <section class="pt-4 pb-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h1 class="h3">{{ '<?= $name_snake_case ?>.read.h1'|trans({ '%identifier%': <?= $entity_snake_case ?> }) }}</h1>
+                </div>
+                <div class="col-sm-6 text-right">
+                    <p>
+                        <a href="{{ path('<?= $route_name ?>_search') }}" class="btn btn-primary" role="button">
+                            <i class="fas fa-reply"></i> {{ 'button.back'|trans() }}
+                        </a>
 <?php if ($config['read']['action_up']): ?>
 <?php if ($config['update']['activate']): ?>
-                    {% if can_update %}
+                        {% if can_update %}
 <?php if ($config['update']['multi_select']): ?>
-                        <a href="{{ path('<?= $route_name ?>_update', {'<?= $entity_identifier_snake_case_plural ?>': {0: <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}}) }}" title="{{ 'button.update_title'|trans() }}"
+                            <a href="{{ path('<?= $route_name ?>_update', {'<?= $entity_identifier_snake_case_plural ?>': {0: <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}}) }}" title="{{ 'button.update_title'|trans() }}"
 <?php else: ?>
-                        <a href="{{ path('<?= $route_name ?>_update', {'<?= $entity_identifier_snake_case ?>': <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}) }}" title="{{ 'button.update_title'|trans() }}"
+                            <a href="{{ path('<?= $route_name ?>_update', {'<?= $entity_identifier_snake_case ?>': <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}) }}" title="{{ 'button.update_title'|trans() }}"
 <?php endif ?>
-                            class="btn btn-warning" aria-label="{{ 'button.update_title'|trans() }}" role="button">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                    {% endif %}
+                                class="btn btn-warning" aria-label="{{ 'button.update_title'|trans() }}" role="button">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        {% endif %}
 <?php endif ?>
 <?php if ($config['delete']['activate']): ?>
-                    {% if can_delete %}
-                        <a href="#" class="btn btn-danger btn-delete" data-toggle="modal" data-target="#delete"
-                            data-title="{{ <?= $entity_snake_case ?> }}" role="button"
+                        {% if can_delete %}
+                            <a href="#" class="btn btn-danger btn-delete" data-toggle="modal" data-target="#delete"
+                                data-title="{{ <?= $entity_snake_case ?> }}" role="button"
 <?php if ($config['delete']['multi_select']): ?>
-                            data-path="{{ path('<?= $route_name ?>_delete', { '<?= $entity_identifier_snake_case_plural ?>': {0: <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}}) }}"
+                                data-path="{{ path('<?= $route_name ?>_delete', { '<?= $entity_identifier_snake_case_plural ?>': {0: <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}}) }}"
 <?php else: ?>
-                            data-path="{{ path('<?= $route_name ?>_delete', { '<?= $entity_identifier_snake_case ?>': <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}) }}"
+                                data-path="{{ path('<?= $route_name ?>_delete', { '<?= $entity_identifier_snake_case ?>': <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}) }}"
 <?php endif ?>
-                            title="{{ 'button.delete_title'|trans() }}" aria-label="{{ 'button.delete_title'|trans() }}">
-                            <i class="fas fa-times"></i>
-                        </a>
-                    {% endif %}
+                                title="{{ 'button.delete_title'|trans() }}" aria-label="{{ 'button.delete_title'|trans() }}">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        {% endif %}
 <?php endif ?>
 <?php endif; ?>
-                </p>
+                    </p>
+                </div>
             </div>
-        </div>
-        <hr>
-        <div class="card mt-4 mb-4">
-            <div class="card-body">
-                <h2 class="card-title">{{ '<?= $name_snake_case ?>.read.h2'|trans() }}</h2>
-                <div class="card-content">
-                    <ul class="list-unstyled">
+            <hr>
+            <div class="card mt-4 mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">{{ '<?= $name_snake_case ?>.read.h2'|trans() }}</h2>
+                    <div class="card-content">
+                        <ul class="list-unstyled">
 <?php $entity_fields = $config['read']['fields'] ?>
 <?php foreach ($entity_fields as $field): ?>
-                        <li class="p-2 mb-2">
-                            <strong>{{ '<?= $name_snake_case ?>.<?= 'field.'.$field['label_key_trans'] ?>'|trans() }} : </strong><?= print_field($entity_snake_case, $field) ?>
-                        </li>
+                            <li class="p-2 mb-2">
+                                <strong>{{ '<?= $name_snake_case ?>.<?= 'field.'.$field['label_key_trans'] ?>'|trans() }} : </strong><?= print_field($entity_snake_case, $field) ?>
+                            </li>
 <?php endforeach; ?>
-                    </ul>
-                </div>
-            </div>        
-        </div>
+                        </ul>
+                    </div>
+                </div>        
+            </div>
 <?php if ($config['read']['action_down']): ?>
-        <p class="text-center">
+            <p class="text-center">
 <?php if ($config['update']['activate']): ?>
-            {% if can_update %}
+                {% if can_update %}
 <?php if ($config['update']['multi_select']): ?>
-                <a href="{{ path('<?= $route_name ?>_update', {'<?= $entity_identifier_snake_case_plural ?>': {0: <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}}) }}" title="{{ 'button.update_title'|trans() }}"
+                    <a href="{{ path('<?= $route_name ?>_update', {'<?= $entity_identifier_snake_case_plural ?>': {0: <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}}) }}" title="{{ 'button.update_title'|trans() }}"
 <?php else: ?>
-                <a href="{{ path('<?= $route_name ?>_update', {'<?= $entity_identifier_snake_case ?>': <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}) }}" title="{{ 'button.update_title'|trans() }}"
+                    <a href="{{ path('<?= $route_name ?>_update', {'<?= $entity_identifier_snake_case ?>': <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}) }}" title="{{ 'button.update_title'|trans() }}"
 <?php endif ?>
-                    class="btn btn-warning" aria-label="{{ 'button.update_title'|trans() }}" role="button">
-                    <i class="fas fa-edit"></i>
-                </a>
-            {% endif %}
+                        class="btn btn-warning" aria-label="{{ 'button.update_title'|trans() }}" role="button">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                {% endif %}
 <?php endif ?>
 <?php if ($config['delete']['activate']): ?>
-            {% if can_delete %}
-                <a href="#" class="btn btn-danger btn-delete" data-toggle="modal" data-target="#delete"
-                    data-title="{{ <?= $entity_snake_case ?> }}" role="button"
+                {% if can_delete %}
+                    <a href="#" class="btn btn-danger btn-delete" data-toggle="modal" data-target="#delete"
+                        data-title="{{ <?= $entity_snake_case ?> }}" role="button"
 <?php if ($config['delete']['multi_select']): ?>
-                    data-path="{{ path('<?= $route_name ?>_delete', { '<?= $entity_identifier_snake_case_plural ?>': {0: <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}}) }}"
+                        data-path="{{ path('<?= $route_name ?>_delete', { '<?= $entity_identifier_snake_case_plural ?>': {0: <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}}) }}"
 <?php else: ?>
-                    data-path="{{ path('<?= $route_name ?>_delete', { '<?= $entity_identifier_snake_case ?>': <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}) }}"
+                        data-path="{{ path('<?= $route_name ?>_delete', { '<?= $entity_identifier_snake_case ?>': <?= $entity_snake_case ?>.<?= $entity_identifier_lower_camel_case ?>}) }}"
 <?php endif ?>
-                    title="{{ 'button.delete_title'|trans() }}" aria-label="{{ 'button.delete_title'|trans() }}">
-                    <i class="fas fa-times"></i>
-                </a>
-            {% endif %}
+                        title="{{ 'button.delete_title'|trans() }}" aria-label="{{ 'button.delete_title'|trans() }}">
+                        <i class="fas fa-times"></i>
+                    </a>
+                {% endif %}
 <?php endif ?>
-        </p>
+            </p>
 <?php endif; ?>
-    </div>
-</section>
+        </div>
+    </section>
 {% endblock %}
 <?php if ($config['read']['action_up'] or $config['read']['action_down']): ?>
 <?php if ($config['delete']['activate']): ?>
