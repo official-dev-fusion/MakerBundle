@@ -44,11 +44,15 @@ final class ScrudConfigDebug extends AbstractMaker
     {
         return 'df:scrud:config-debug';
     }
+    
+    public static function getCommandDescription(): string
+    {
+        return 'Display default config.';
+    }
 
     public function configureCommand(Command $command, InputConfiguration $inputConfig)
     {
         $command
-            ->setDescription('Display default config.')
             ->addArgument(
                 'config-file',
                 InputArgument::REQUIRED,

@@ -54,10 +54,14 @@ class FormConfig extends AbstractMaker
         return 'df:form:config';
     }
     
+    public static function getCommandDescription(): string
+    {
+        return 'Create a config file for form generator';
+    }
+    
     public function configureCommand(Command $command, InputConfiguration $inputConfig)
     {
         $command
-            ->setDescription('Create a config file for form generator')
             ->addArgument(
                 'entity-class',
                 InputArgument::OPTIONAL,

@@ -87,10 +87,14 @@ final class FormExec extends AbstractMaker
         return 'df:form:exec';
     }
     
+    public static function getCommandDescription(): string
+    {
+        return 'Generate Form';
+    }
+    
     public function configureCommand(Command $command, InputConfiguration $inputConfig)
     {
         $command
-            ->setDescription('Generate Form')
             ->addArgument(
                 'config-file',
                 InputArgument::REQUIRED,

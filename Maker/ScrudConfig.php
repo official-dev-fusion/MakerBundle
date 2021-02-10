@@ -54,10 +54,14 @@ class ScrudConfig extends AbstractMaker
         return 'df:scrud:config';
     }
     
+    public static function getCommandDescription(): string
+    {
+        return 'Create a config file for scrud generator';
+    }
+    
     public function configureCommand(Command $command, InputConfiguration $inputConfig)
     {
         $command
-            ->setDescription('Create a config file for scrud generator')
             ->addArgument(
                 'entity-class',
                 InputArgument::OPTIONAL,

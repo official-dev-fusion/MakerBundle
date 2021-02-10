@@ -95,10 +95,14 @@ final class ScrudExec extends AbstractMaker
         return 'df:scrud:exec';
     }
     
+    public static function getCommandDescription(): string
+    {
+        return 'Creates advanced SCRUD for Doctrine entity class with personalized search, Bootstrap 4, JQuery and more.';
+    }
+
     public function configureCommand(Command $command, InputConfiguration $inputConfig)
     {
         $command
-            ->setDescription('Creates advanced SCRUD for Doctrine entity class with personalized search, Bootstrap 4, JQuery and more.')
             ->addArgument(
                 'config-file',
                 InputArgument::REQUIRED,
@@ -394,25 +398,25 @@ final class ScrudExec extends AbstractMaker
             ]);
         if ($config['search']['pagination']) {
             $method->addParam(
-                (new \PhpParser\Builder\Param('request'))->setTypeHint('Request')
+                (new \PhpParser\Builder\Param('request'))->setType('Request')
             );
             $method->addParam(
-                (new \PhpParser\Builder\Param('session'))->setTypeHint('Session')
+                (new \PhpParser\Builder\Param('session'))->setType('Session')
             );
         }
         if ($config['search']['filter_view']['activate']) {
             $method->addParam(
-                (new \PhpParser\Builder\Param('data'))->setTypeHint('array')
+                (new \PhpParser\Builder\Param('data'))->setType('array')
             );
         }
         
         if ($config['search']['pagination']) {
             $method->addParam(
-                (new \PhpParser\Builder\Param('page'))->setTypeHint('string')->makeByRef()
+                (new \PhpParser\Builder\Param('page'))->setType('string')->makeByRef()
             );
             if (!$config['search']['filter_view']['activate']) {
                 $method->addParam(
-                    (new \PhpParser\Builder\Param('numberByPage'))->setTypeHint('int')
+                    (new \PhpParser\Builder\Param('numberByPage'))->setType('int')
                 );
             }
         }
@@ -430,7 +434,7 @@ final class ScrudExec extends AbstractMaker
         
         if ($config['search']['filter_view']['activate']) {
             $method->addParam(
-                (new \PhpParser\Builder\Param('data'))->setTypeHint('array')
+                (new \PhpParser\Builder\Param('data'))->setType('array')
             );
         }
         $methodBody = $this->templating->render(
