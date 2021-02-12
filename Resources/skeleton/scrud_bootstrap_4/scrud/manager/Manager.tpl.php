@@ -68,7 +68,8 @@ class <?= $class_name ?><?= "\n" ?>
     public function configFormFilter(FormInterface $form)
     {
 <?php if ($config['search']['pagination']): ?>
-        $page = $this->requestStack->getCurrentRequest()->get('page', $this->session->get('<?= $route_name ?>_page', 1));
+        $page = $this->requestStack->getCurrentRequest()->get('page');
+        $page ?: $page = $this->session->get('<?= $route_name ?>_page', 1);
         $this->session->set('<?= $route_name ?>_page', $page);
 <?php endif ?>
         if (!$form->getData()) {
