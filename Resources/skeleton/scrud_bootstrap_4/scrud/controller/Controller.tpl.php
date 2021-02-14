@@ -3,8 +3,10 @@
 namespace <?= $namespace ?>;
 
 use <?= $entity_full_class_name ?>;
-<?php if ($config['update']['multi_select']): ?>
+<?php if ($config['update']['multi_select'] or $config['delete']['multi_select']): ?>
 use <?= $form_batch_full_class_name ?>;
+<?php endif ?>
+<?php if ($config['update']['multi_select']): ?>
 use <?= $form_collection_update_full_class_name ?>;
 <?php endif ?>
 <?php if ($config['search']['filter_view']['activate']): ?>

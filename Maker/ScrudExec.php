@@ -470,7 +470,7 @@ final class ScrudExec extends AbstractMaker
         try {
             $fileTranslation = Yaml::parseFile($pathFileTranslation);
         } catch (ParseException $exception) {
-            printf('Unable to parse the YAML string: %s', $exception->getMessage());
+            throw new \Exception(sprintf('Unable to parse the translation file: %s', $exception->getMessage()));
         }
         if (!$fileTranslation) {
             $fileTranslation=[];
