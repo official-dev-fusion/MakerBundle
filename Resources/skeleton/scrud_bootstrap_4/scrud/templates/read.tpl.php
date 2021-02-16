@@ -100,7 +100,7 @@
 <?php $entity_fields = $config['read']['fields'] ?>
 <?php foreach ($entity_fields as $field): ?>
                             <li class="p-2 mb-2">
-                                <strong>{{ '<?= $name_snake_case ?>.<?= 'field.'.$field['label_key_trans'] ?>'|trans() }} : </strong><?= print_field($entity_snake_case, $field) ?>
+                                <strong>{{ '<?= $name_snake_case ?>.<?= 'field.'.$field['label_key_trans'] ?>'|trans() }} : </strong><?= print_field($entity_snake_case, $field) . "\n" ?>
                             </li>
 <?php endforeach; ?>
                         </ul>
